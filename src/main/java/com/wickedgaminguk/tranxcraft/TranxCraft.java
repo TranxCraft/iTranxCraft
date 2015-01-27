@@ -37,22 +37,10 @@ public class TranxCraft extends BukkitPlugin {
     public AdminManager adminManager;
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        return handler.handleCommand(sender, cmd, commandLabel, args);
-    }
-
-    @Override
     public void onLoad() {
         plugin = this;
         config = new YamlConfig(plugin, "config.yml");
         handler = new BukkitCommandHandler(plugin);
-    }
-
-    @Override
-    public void onDisable() {
-        if (database.isOpen()) {
-            database.closeConnection();
-        }
     }
 
     @Override
@@ -106,5 +94,17 @@ public class TranxCraft extends BukkitPlugin {
         else {
             LoggerUtils.info(plugin, "Test ban hasn't expired.");
         }
+    }
+
+    @Override
+    public void onDisable() {
+        if (database.isOpen()) {
+            database.closeConnection();
+        }
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        return handler.handleCommand(sender, cmd, commandLabel, args);
     }
 }
