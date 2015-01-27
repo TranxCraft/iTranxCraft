@@ -14,15 +14,18 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class ModuleLoader {
-    
+
+    private static HashMap<String, Module> modules = new HashMap<>();
     private TranxCraft plugin;
-    
-    public ModuleLoader (TranxCraft plugin) {
+
+    public ModuleLoader(TranxCraft plugin) {
         this.plugin = plugin;
     }
-    
-    private static HashMap<String, Module> modules = new HashMap<>();
-    
+
+    public static Module getModule(String name) {
+        return modules.get(name);
+    }
+
     public void loadModules(Package pkg) {
         Reflections modules = new Reflections(pkg);
 
@@ -41,10 +44,24 @@ public class ModuleLoader {
             }
         }
     }
-    
+
+    public boolean loadModule(Class<? extends Module> module) {
+        try {
+            Constructor<?> constructor = module.getConstructor(TranxCraft.class);
+            Module mod = (Module) constructor.newInstance(plugin);
+
+            modules.put(mod.getClass().getSimpleName(), mod);
+        }
+        catch (Exception ex) {
+            LoggerUtils.severe(plugin, "Error loading module " + module.getSimpleName() + " because: " + ex);
+            return false;
+        }
+
+        return true;
+    }
+
     public void loadModules(File[] files) {
         for (File file : files) {
-            LoggerUtils.info(plugin, file.getName());
             if (file.isDirectory()) {
                 LoggerUtils.info(plugin, file.getName() + " is a directory.");
                 break;
@@ -55,14 +72,15 @@ public class ModuleLoader {
             }
         }
     }
-    
+
     public boolean loadModule(File file) {
         try {
             JarFile jar = new JarFile(file);
             JarEntry entry = jar.getJarEntry("module.yml");
+
             PluginDescriptionFile descriptionFile = new PluginDescriptionFile(jar.getInputStream(entry));
             Class<? extends Module> module;
-            
+
             try {
                 module = Class.forName(descriptionFile.getMain()).asSubclass(Module.class);
             }
@@ -74,7 +92,7 @@ public class ModuleLoader {
                 LoggerUtils.info(ex.getMessage());
                 return false;
             }
-            
+
             if (!module.isAssignableFrom(Module.class)) {
                 LoggerUtils.warning(plugin, "Module " + descriptionFile.getName() + " cannot be loaded. Main class does not extend Module.");
                 return false;
@@ -82,7 +100,7 @@ public class ModuleLoader {
             else {
                 loadModule(module);
                 return true;
-            }            
+            }
         }
         catch (IOException ex) {
             LoggerUtils.info(ex.getMessage());
@@ -92,23 +110,5 @@ public class ModuleLoader {
             LoggerUtils.info(ex.getMessage());
             return false;
         }
-    }
-    
-    public boolean loadModule(Class<? extends Module> module) {
-        try {
-            Constructor<?> constructor = module.getConstructor(TranxCraft.class);
-            Module mod = (Module) constructor.newInstance(plugin);
-            
-            modules.put(mod.getClass().getSimpleName(), mod);
-        }
-        catch(Exception ex) {
-            LoggerUtils.severe(plugin, "Error loading module " + module.getSimpleName() + " because: " + ex);
-            return false;
-        }
-        return true;
-    }
-    
-    public static Module getModule(String name) {
-        return modules.get(name);
     }
 }

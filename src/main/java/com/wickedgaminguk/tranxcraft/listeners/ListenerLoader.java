@@ -5,20 +5,19 @@ import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.reflections.Reflections;
-
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
 public class ListenerLoader {
-    
+
     private TranxCraft plugin;
     private PluginManager pluginManager;
-    
+
     public ListenerLoader(TranxCraft plugin) {
         this.plugin = plugin;
         this.pluginManager = plugin.getServer().getPluginManager();
     }
-    
+
     public void loadListeners(Package pkg) {
         Reflections listeners = new Reflections(pkg);
 
@@ -31,7 +30,7 @@ public class ListenerLoader {
             loadListener(listener);
         }
     }
-    
+
     public void loadListener(Class<? extends Listener> listener) {
         try {
             Constructor<?> constructor = listener.getConstructor(TranxCraft.class);

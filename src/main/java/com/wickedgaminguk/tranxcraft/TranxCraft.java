@@ -7,8 +7,10 @@ import com.wickedgaminguk.tranxcraft.listeners.PlayerListener;
 import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
 import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import com.wickedgaminguk.tranxcraft.modules.WarnModule;
+import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.utils.BanUtils;
 import com.wickedgaminguk.tranxcraft.utils.LogUtils;
+import com.wickedgaminguk.tranxcraft.utils.Util;
 import net.pravian.bukkitlib.BukkitLib;
 import net.pravian.bukkitlib.command.BukkitCommandHandler;
 import net.pravian.bukkitlib.config.YamlConfig;
@@ -16,7 +18,6 @@ import net.pravian.bukkitlib.implementation.BukkitPlugin;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-
 import java.io.File;
 import java.util.logging.Level;
 
@@ -30,8 +31,15 @@ public class TranxCraft extends BukkitPlugin {
     public ModuleLoader modLoader;
     public BanUtils banUtils;
     public LogUtils logUtils;
+    public Util util;
     public SqlModule sqlModule;
     public WarnModule warnModule;
+    public AdminManager adminManager;
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        return handler.handleCommand(sender, cmd, commandLabel, args);
+    }
 
     @Override
     public void onLoad() {
@@ -41,9 +49,16 @@ public class TranxCraft extends BukkitPlugin {
     }
 
     @Override
+    public void onDisable() {
+        if (database.isOpen()) {
+            database.closeConnection();
+        }
+    }
+
+    @Override
     public void onEnable() {
         BukkitLib.init(plugin);
-        
+
         config.load();
 
         database = new MySQL(config.getString("mysql.hostname"), config.getString("mysql.port"), config.getString("mysql.username"), config.getString("mysql.password"), config.getString("mysql.database"));
@@ -52,9 +67,10 @@ public class TranxCraft extends BukkitPlugin {
         handler.setCommandLocation(Command_tranxcraft.class.getPackage());
 
         listenerLoader = new ListenerLoader(plugin);
-        listenerLoader.loadListeners(PlayerListener.class.getPackage());
-        
         modLoader = new ModuleLoader(plugin);
+        adminManager = new AdminManager(plugin);
+
+        listenerLoader.loadListeners(PlayerListener.class.getPackage());
         modLoader.loadModules(SqlModule.class.getPackage());
         modLoader.loadModules(new File(plugin.getDataFolder() + "/modules").listFiles());
 
@@ -68,9 +84,14 @@ public class TranxCraft extends BukkitPlugin {
                 LoggerUtils.info(plugin, "Database initialized.");
             }
         }
+
         banUtils = new BanUtils(plugin);
         logUtils = new LogUtils(plugin, Level.parse(sqlModule.getConfigEntry("loglevel").toUpperCase()));
-        
+        util = new Util(plugin);
+
+        adminManager.loadCache();
+        banUtils.loadCache();
+
         if (banUtils.isBanned("90eb5d86-ed60-4165-a36e-bb77aa3c6664")) {
             LoggerUtils.info(plugin, "Bans Worked.");
         }
@@ -78,25 +99,12 @@ public class TranxCraft extends BukkitPlugin {
         if (banUtils.isExpired("90eb5d86-ed60-4165-a36e-bb77aa3c6664")) {
             LoggerUtils.info(plugin, "Ban has expired.");
         }
-        
+
         if (banUtils.isExpired("test")) {
             LoggerUtils.info(plugin, "Ban has expired.");
         }
         else {
             LoggerUtils.info(plugin, "Test ban hasn't expired.");
         }
-    }
-
-
-    @Override
-    public void onDisable() {
-        if (database.isOpen()) {
-            database.closeConnection();
-        }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        return handler.handleCommand(sender, cmd, commandLabel, args);
     }
 }

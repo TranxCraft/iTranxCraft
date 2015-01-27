@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -14,25 +13,15 @@ import java.net.URL;
 
 //Credits to https://github.com/DarthCraft/DarthCraft/blob/master/src/net/darthcraft/dcmod/addons/BanWarner.java
 public class WarnModule extends Module {
-    
+
     private TranxCraft plugin;
-    
-    public WarnModule(TranxCraft plugin) {
+
+    protected WarnModule(TranxCraft plugin) {
         this.plugin = plugin;
     }
 
     public void runCheck(Player player) {
         getFishbansRunnable(player).runTaskAsynchronously(plugin);
-    }
-
-    public URL getUrl(Player player) {
-        try {
-            return new URL("http://api.fishbans.com/stats/" + player.getName());
-        }
-        catch (MalformedURLException ex) {
-            LoggerUtils.warning("Could not generate fishbans URL for " + player.getName());
-            return null;
-        }
     }
 
     public BukkitRunnable getFishbansRunnable(final Player player) {
@@ -59,6 +48,16 @@ public class WarnModule extends Module {
                 getWarnRunnable(json).runTask(plugin);
             }
         };
+    }
+
+    public URL getUrl(Player player) {
+        try {
+            return new URL("http://api.fishbans.com/stats/" + player.getName());
+        }
+        catch (MalformedURLException ex) {
+            LoggerUtils.warning("Could not generate fishbans URL for " + player.getName());
+            return null;
+        }
     }
 
     public BukkitRunnable getWarnRunnable(final JSONObject object) {
@@ -92,7 +91,6 @@ public class WarnModule extends Module {
                         plugin.adminChat.sendAdminMessage("BanWarner", ChatColor.RED + "Warning: " + services.get(service) + " times on " + service);
                         */
                     }
-
                 }
                 catch (Exception ex) {
                     plugin.logUtils.debug("Error parsing fishbans JSON: " + object);

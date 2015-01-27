@@ -4,3 +4,8 @@ version: 1.0
 authors: [WickedGamingUK]
 description: The custom developed plugin for TranxCraft.
 website: https://www.tranxcraft.com/
+commands:
+    tranxcraft:
+        usage: /<command>
+        description: Displays useful information about TranxCraft.
+        aliases: [tc]
