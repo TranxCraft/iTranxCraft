@@ -10,7 +10,7 @@ public class SqlModule extends Module {
     private TranxCraft plugin;
     private MySQL database;
 
-    protected SqlModule(TranxCraft plugin) {
+    public SqlModule(TranxCraft plugin) {
         this.plugin = plugin;
         this.database = plugin.database;
     }

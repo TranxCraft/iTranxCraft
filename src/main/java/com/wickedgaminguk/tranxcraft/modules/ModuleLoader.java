@@ -5,6 +5,8 @@ import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.reflections.Reflections;
+import org.xeustechnologies.jcl.JarClassLoader;
+import org.xeustechnologies.jcl.JclObjectFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -16,7 +18,10 @@ import java.util.jar.JarFile;
 public class ModuleLoader {
 
     private static HashMap<String, Module> modules = new HashMap<>();
+    
     private TranxCraft plugin;
+    private JarClassLoader classLoader = new JarClassLoader();
+    private JclObjectFactory factory = JclObjectFactory.getInstance();
 
     public ModuleLoader(TranxCraft plugin) {
         this.plugin = plugin;
@@ -40,7 +45,7 @@ public class ModuleLoader {
                 LoggerUtils.info("Loaded Module " + module.getSimpleName() + " successfully");
             }
             else {
-                LoggerUtils.severe(plugin, "Issue loading module.");
+                LoggerUtils.severe(plugin, "Issue loading module ");
             }
         }
     }
@@ -67,8 +72,13 @@ public class ModuleLoader {
                 break;
             }
             else {
-                LoggerUtils.info(plugin, "Loading Module...");
-                loadModule(file);
+                LoggerUtils.info(plugin, "Loading module " + file.getName());
+                if (loadModule(file)) {
+                    LoggerUtils.info("Loaded Module " + file.getName() + " successfully");
+                }
+                else {
+                    LoggerUtils.severe(plugin, "Issue loading module");
+                }
             }
         }
     }
@@ -76,38 +86,27 @@ public class ModuleLoader {
     public boolean loadModule(File file) {
         try {
             JarFile jar = new JarFile(file);
+            
+            classLoader.add(file.getAbsolutePath());
+            
             JarEntry entry = jar.getJarEntry("module.yml");
 
             PluginDescriptionFile descriptionFile = new PluginDescriptionFile(jar.getInputStream(entry));
-            Class<? extends Module> module;
 
-            try {
-                module = Class.forName(descriptionFile.getMain()).asSubclass(Module.class);
-            }
-            catch (ClassCastException ex) {
-                LoggerUtils.info(ex.getMessage());
-                return false;
-            }
-            catch (ClassNotFoundException ex) {
-                LoggerUtils.info(ex.getMessage());
-                return false;
-            }
-
-            if (!module.isAssignableFrom(Module.class)) {
-                LoggerUtils.warning(plugin, "Module " + descriptionFile.getName() + " cannot be loaded. Main class does not extend Module.");
-                return false;
-            }
-            else {
-                loadModule(module);
-                return true;
-            }
+            Object object = factory.create(classLoader, descriptionFile.getMain(), plugin);
+            
+            Module module = (Module) object;
+            
+            modules.put(descriptionFile.getMain(), module);
+            
+            return true;
         }
         catch (IOException ex) {
-            LoggerUtils.info(ex.getMessage());
+            LoggerUtils.severe(plugin, ex);
             return false;
         }
         catch (InvalidDescriptionException ex) {
-            LoggerUtils.info(ex.getMessage());
+            LoggerUtils.severe(plugin, ex);
             return false;
         }
     }

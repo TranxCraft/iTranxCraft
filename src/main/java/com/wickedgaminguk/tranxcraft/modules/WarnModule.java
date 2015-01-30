@@ -16,7 +16,7 @@ public class WarnModule extends Module {
 
     private TranxCraft plugin;
 
-    protected WarnModule(TranxCraft plugin) {
+    public WarnModule(TranxCraft plugin) {
         this.plugin = plugin;
     }
 
