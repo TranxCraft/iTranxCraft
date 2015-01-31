@@ -4,13 +4,16 @@ import com.visionwarestudios.database.mysql.MySQL;
 import com.wickedgaminguk.tranxcraft.commands.Command_tranxcraft;
 import com.wickedgaminguk.tranxcraft.listeners.ListenerLoader;
 import com.wickedgaminguk.tranxcraft.listeners.PlayerListener;
+import com.wickedgaminguk.tranxcraft.modules.MailModule;
 import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
 import com.wickedgaminguk.tranxcraft.modules.SqlModule;
+import com.wickedgaminguk.tranxcraft.modules.TwitterModule;
 import com.wickedgaminguk.tranxcraft.modules.WarnModule;
 import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.utils.BanUtils;
-import com.wickedgaminguk.tranxcraft.utils.LogUtils;
+import com.wickedgaminguk.tranxcraft.utils.DebugUtils;
 import com.wickedgaminguk.tranxcraft.utils.Util;
+import com.wickedgaminguk.tranxcraft.utils.ValidationUtils;
 import net.pravian.bukkitlib.BukkitLib;
 import net.pravian.bukkitlib.command.BukkitCommandHandler;
 import net.pravian.bukkitlib.config.YamlConfig;
@@ -30,10 +33,12 @@ public class TranxCraft extends BukkitPlugin {
     public ListenerLoader listenerLoader;
     public ModuleLoader modLoader;
     public BanUtils banUtils;
-    public LogUtils logUtils;
+    public DebugUtils debugUtils;
     public Util util;
     public SqlModule sqlModule;
     public WarnModule warnModule;
+    private MailModule mailModule;
+    public TwitterModule twitterModule;
     public AdminManager adminManager;
 
     @Override
@@ -46,54 +51,65 @@ public class TranxCraft extends BukkitPlugin {
     @Override
     public void onEnable() {
         BukkitLib.init(plugin);
-
+        
         config.load();
-
+        
+        if (!ValidationUtils.isValidSql(config)) {
+            LoggerUtils.severe(plugin, "Invalid MySQL configuration found. This plugin will now disable.");
+            return;
+        }
+        
         database = new MySQL(config.getString("mysql.hostname"), config.getString("mysql.port"), config.getString("mysql.username"), config.getString("mysql.password"), config.getString("mysql.database"));
         database.openConnection();
-
+        
+        if (database.isOpen()) {
+            LoggerUtils.info(plugin, "Database connection opened.");
+        }
+        else {
+            LoggerUtils.info(plugin, "Database failed to open.");
+            return;
+        }
+        
         handler.setCommandLocation(Command_tranxcraft.class.getPackage());
-
+        
         listenerLoader = new ListenerLoader(plugin);
+        
         modLoader = new ModuleLoader(plugin);
+        
         adminManager = new AdminManager(plugin);
-
+        
         listenerLoader.loadListeners(PlayerListener.class.getPackage());
         modLoader.loadModules(SqlModule.class.getPackage());
         modLoader.loadModules(new File(plugin.getDataFolder() + "/modules").listFiles());
 
         sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
-        warnModule = (WarnModule) ModuleLoader.getModule("WarnModule");
 
         if (database.isOpen()) {
             if (!sqlModule.isInitialized()) {
-                LoggerUtils.info(plugin, "Initializing database...");
+                LoggerUtils.info(plugin, "Initializing database.");
                 sqlModule.initialize();
                 LoggerUtils.info(plugin, "Database initialized.");
             }
         }
+        
+        warnModule = (WarnModule) ModuleLoader.getModule("WarnModule");
+        mailModule = (MailModule) ModuleLoader.getModule("MailModule");
+        twitterModule = (TwitterModule) ModuleLoader.getModule("TwitterModule");
 
         banUtils = new BanUtils(plugin);
-        logUtils = new LogUtils(plugin, Level.parse(sqlModule.getConfigEntry("loglevel").toUpperCase()));
+        debugUtils = new DebugUtils(plugin, Level.parse(sqlModule.getConfigEntry("loglevel").toUpperCase()));
+        debugUtils.test();
+        
+        if (!ValidationUtils.isValidEmailConfig(sqlModule)) {
+            LoggerUtils.warning(plugin, "Invalid Mail configuration found. Mail functionality will be disabled.");
+            mailModule.setEnabled(false);
+        }
+
         util = new Util(plugin);
-
-        adminManager.loadCache();
-        banUtils.loadCache();
-
-        if (banUtils.isBanned("90eb5d86-ed60-4165-a36e-bb77aa3c6664")) {
-            LoggerUtils.info(plugin, "Bans Worked.");
-        }
-
-        if (banUtils.isExpired("90eb5d86-ed60-4165-a36e-bb77aa3c6664")) {
-            LoggerUtils.info(plugin, "Ban has expired.");
-        }
-
-        if (banUtils.isExpired("test")) {
-            LoggerUtils.info(plugin, "Ban has expired.");
-        }
-        else {
-            LoggerUtils.info(plugin, "Test ban hasn't expired.");
-        }
+        
+        LoggerUtils.info(plugin, "Loaded " + ModuleLoader.getModuleCount() + " modules.");
+        LoggerUtils.info(plugin, "Found " + banUtils.loadCache() + " bans.");
+        LoggerUtils.info(plugin, "Found " + adminManager.loadCache() + " admins.");
     }
 
     @Override

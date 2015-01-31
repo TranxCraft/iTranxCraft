@@ -15,10 +15,6 @@ import java.util.concurrent.Callable;
 
 public class FetcherUtils {
 
-    public static UUID fetchUuid(Player player) {
-        return fetchUuid(player.getName());
-    }
-
     public static UUID fetchUuid(String player) {
         UUID playerId = null;
 
@@ -29,6 +25,10 @@ public class FetcherUtils {
         }
 
         return playerId;
+    }
+
+    public static UUID fetchUuid(Player player) {
+        return fetchUuid(player.getName());
     }
 
     public static String fetchPlayer(UUID uuid) {
@@ -46,7 +46,10 @@ public class FetcherUtils {
 
         return playerName;
     }
-
+    
+    public static String fetchPlayer(String uuid) {
+        return fetchPlayer(UUID.fromString(uuid));
+    }
 
     public static class NameFetcher implements Callable<Map<UUID, String>> {
 

@@ -37,13 +37,13 @@ public class WarnModule extends Module {
                     in.close();
                 }
                 catch (Exception ex) {
-                    plugin.logUtils.debug("Error fetching fishbans information from " + url.getHost());
-                    plugin.logUtils.debug(ex.getMessage());
+                    plugin.debugUtils.debug("Error fetching fishbans information from " + url.getHost());
+                    plugin.debugUtils.debug(ex.getMessage());
                     return;
                 }
 
-                plugin.logUtils.debug(url.toString());
-                plugin.logUtils.debug(json.toJSONString());
+                plugin.debugUtils.debug(url.toString());
+                plugin.debugUtils.debug(json.toJSONString());
 
                 getWarnRunnable(json).runTask(plugin);
             }
@@ -66,8 +66,8 @@ public class WarnModule extends Module {
             public void run() {
                 try {
                     if (object.get("success").equals(false)) {
-                        plugin.logUtils.debug("Fishbans returned success: false");
-                        plugin.logUtils.debug(object.get("error").toString());
+                        plugin.debugUtils.debug("Fishbans returned success: false");
+                        plugin.debugUtils.debug(object.get("error").toString());
                         return;
                     }
 
@@ -93,8 +93,8 @@ public class WarnModule extends Module {
                     }
                 }
                 catch (Exception ex) {
-                    plugin.logUtils.debug("Error parsing fishbans JSON: " + object);
-                    plugin.logUtils.debug(ex.toString());
+                    plugin.debugUtils.debug("Error parsing fishbans JSON: " + object);
+                    plugin.debugUtils.debug(ex.toString());
                 }
             }
         };

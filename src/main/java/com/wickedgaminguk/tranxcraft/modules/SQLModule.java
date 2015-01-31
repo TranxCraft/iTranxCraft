@@ -2,6 +2,7 @@ package com.wickedgaminguk.tranxcraft.modules;
 
 import com.visionwarestudios.database.mysql.MySQL;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import net.pravian.bukkitlib.util.LoggerUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -37,15 +38,15 @@ public class SqlModule extends Module {
     }
 
     public String getConfigEntry(String entry) {
-        ResultSet response = getDatabase().query("SELECT * FROM `config` WHERE `config` = ?;", entry);
+        ResultSet response = getDatabase().query("SELECT * FROM `config` WHERE `config` = ?", entry);
 
         try {
             response.next();
             return response.getString("entry");
         }
         catch (SQLException ex) {
-            plugin.logUtils.debug(ex.getMessage());
-            return null;
+            plugin.debugUtils.debug(ex.getMessage());
+            return "";
         }
     }
 

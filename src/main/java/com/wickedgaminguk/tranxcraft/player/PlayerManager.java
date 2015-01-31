@@ -36,7 +36,7 @@ public class PlayerManager {
             }
         }
         catch (SQLException ex) {
-            plugin.logUtils.debug(ex.getMessage());
+            plugin.debugUtils.debug(ex.getMessage());
         }
 
         return (TranxPlayer[]) players.toArray();

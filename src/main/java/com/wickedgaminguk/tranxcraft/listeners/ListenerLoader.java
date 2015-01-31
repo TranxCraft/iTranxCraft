@@ -35,7 +35,7 @@ public class ListenerLoader {
         try {
             Constructor<?> constructor = listener.getConstructor(TranxCraft.class);
             pluginManager.registerEvents((Listener) constructor.newInstance(plugin), plugin);
-            LoggerUtils.info("Registered Listener " + listener.getSimpleName() + " successfully");
+            LoggerUtils.info(plugin, "Registered Listener " + listener.getSimpleName() + " successfully");
         }
         catch (Exception ex) {
             LoggerUtils.severe(plugin, "Error registering listener " + listener.getSimpleName() + " because " + ex);

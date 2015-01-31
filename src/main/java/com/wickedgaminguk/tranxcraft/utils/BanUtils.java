@@ -106,12 +106,14 @@ public class BanUtils {
         banCache.remove(uuid);
     }
 
-    public void loadCache() {
-        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `admins`");
-
+    public int loadCache() {
+        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `bans`");
+        int banCount = 0;
+        
         try {
             while (result.next()) {
                 Ban ban = new Ban();
+                banCount++;
 
                 ban.setUuid(result.getString("uuid"));
                 ban.setPlayer(result.getString("player"));
@@ -124,7 +126,9 @@ public class BanUtils {
             }
         }
         catch (SQLException ex) {
-            plugin.logUtils.debug(ex.getMessage());
+            plugin.debugUtils.debug(ex.getMessage());
         }
+        
+        return banCount;
     }
 }

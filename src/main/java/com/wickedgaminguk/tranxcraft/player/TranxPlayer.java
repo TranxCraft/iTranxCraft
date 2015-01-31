@@ -47,7 +47,7 @@ public class TranxPlayer {
             return player;
         }
         catch (SQLException ex) {
-            plugin.logUtils.debug(ex.getMessage());
+            plugin.debugUtils.debug(ex.getMessage());
             return player;
         }
     }
