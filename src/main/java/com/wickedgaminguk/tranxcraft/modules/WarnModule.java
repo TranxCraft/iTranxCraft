@@ -12,13 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 //Credits to https://github.com/DarthCraft/DarthCraft/blob/master/src/net/darthcraft/dcmod/addons/BanWarner.java
-public class WarnModule extends Module {
-
-    private TranxCraft plugin;
-
-    public WarnModule(TranxCraft plugin) {
-        this.plugin = plugin;
-    }
+public class WarnModule extends Module<TranxCraft> {
 
     public void runCheck(Player player) {
         getFishbansRunnable(player).runTaskAsynchronously(plugin);

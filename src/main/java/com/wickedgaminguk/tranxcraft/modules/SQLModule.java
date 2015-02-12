@@ -2,19 +2,11 @@ package com.wickedgaminguk.tranxcraft.modules;
 
 import com.visionwarestudios.database.mysql.MySQL;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
-import net.pravian.bukkitlib.util.LoggerUtils;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SqlModule extends Module {
-
-    private TranxCraft plugin;
-    private MySQL database;
-
-    public SqlModule(TranxCraft plugin) {
-        this.plugin = plugin;
-        this.database = plugin.database;
-    }
+public class SqlModule extends Module<TranxCraft> {
 
     public boolean isInitialized() {
         return false;
@@ -25,24 +17,20 @@ public class SqlModule extends Module {
         getDatabase().update("CREATE TABLE IF NOT EXISTS `config` (`config` text, `entry` text) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
         getDatabase().update("CREATE TABLE IF NOT EXISTS `admins` (`uuid` binary(36) DEFAULT NULL, `player` text, `ip` text, `rank` text) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
         getDatabase().update("CREATE TABLE IF NOT EXISTS `players` (`uuid` binary(36) DEFAULT NULL, `player` text, `latestip` text, `kills` int(11) DEFAULT NULL, `deaths` int(11) DEFAULT NULL, `forumname` text) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
+        getDatabase().update("CREATE TABLE IF NOT EXISTS `announcements` (`announcement` text, `interval` int(11) DEFAULT NULL) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
+        getDatabase().update("CREATE TABLE IF NOT EXISTS `statistics` (`statistic` text, `value` text) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
     }
 
     public MySQL getDatabase() {
-        return this.database;
+        return plugin.database;
     }
-
-    public boolean getBoolean(String entry) {
-        String response = getConfigEntry(entry);
-
-        return response.equals("1");
-    }
-
-    public String getConfigEntry(String entry) {
-        ResultSet response = getDatabase().query("SELECT * FROM `config` WHERE `config` = ?", entry);
+    
+    public String getEntry(String table, String entry, String value) {
+        ResultSet result = getDatabase().query(StrUtils.concatenate("SELECT * FROM `", table, "` WHERE `", entry, "` = '" , value, "';"));
 
         try {
-            response.next();
-            return response.getString("entry");
+            result.next();
+            return result.getString(value);
         }
         catch (SQLException ex) {
             plugin.debugUtils.debug(ex.getMessage());
@@ -50,11 +38,28 @@ public class SqlModule extends Module {
         }
     }
 
-    public int getInt(String entry) {
-        return Integer.valueOf(getConfigEntry(entry));
+    public String getConfigEntry(String entry) {
+        return getEntry("config", "config", entry);
+    }
+    
+    public String getStatistic(String statistic) {
+        return getEntry("statistics", "statistic", statistic);
+    }
+    
+    public int getRowCount(String table) {
+        ResultSet result = getDatabase().query("SELECT COUNT(*) FROM ?;", table);
+        
+        try {
+            result.next();
+            return result.getInt("rowcount");
+        }
+        catch (SQLException ex) {
+            plugin.debugUtils.debug(ex);
+            return -1;
+        }
     }
 
-    public double getDouble(String entry) {
-        return Double.valueOf(getConfigEntry(entry));
+    public void setStatistic(String statistic, String value) {
+        getDatabase().update("INSERT INTO `statistics` (`statistic`, `value`) VALUES (?, ?);", statistic, value);
     }
 }

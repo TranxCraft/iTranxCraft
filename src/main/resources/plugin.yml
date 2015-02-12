@@ -9,3 +9,12 @@ commands:
         usage: /<command>
         description: Displays useful information about TranxCraft.
         aliases: [tc]
+    admin:
+        usage: /<command> <add|set|remove|info|list> <player>
+        description: Admin management.
+    ban:
+        usage: /<command> <player> <reason>
+        description: Ban management.
+    warn:
+        usage: /<command> <player> <reason>
+        description: Warn a player.

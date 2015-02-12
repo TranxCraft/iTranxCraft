@@ -7,7 +7,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 
-public class TwitterModule extends Module {
+public class TwitterModule extends Module<TranxCraft> {
     
     private TranxCraft plugin;
     private SqlModule sqlModule;
@@ -17,8 +17,7 @@ public class TwitterModule extends Module {
     private final String ACCESS_TOKEN;
     private final String ACCESS_TOKEN_SECRET;
     
-    public TwitterModule(TranxCraft plugin) {
-        this.plugin = plugin;
+    public TwitterModule() {
         this.sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         
         this.CONSUMER_KEY = sqlModule.getConfigEntry("twitter_consumerkey");

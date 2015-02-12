@@ -1,4 +1,4 @@
-package com.wickedgaminguk.tranxcraft.utils;
+package com.wickedgaminguk.tranxcraft.util;
 
 import com.google.common.collect.ImmutableList;
 import org.bukkit.entity.Player;
@@ -13,13 +13,18 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class FetcherUtils {
+public class FetcherUtils extends Util {
 
+    /** Fetches the UUID of a player.
+     * @param player The player you want to fetch the UUID from.
+     * @return The UUID of the player.
+     */
     public static UUID fetchUuid(String player) {
         UUID playerId = null;
 
         try {
             playerId = UUIDFetcher.getUUIDOf(player);
+            fetchUuid("");
         }
         catch (Exception ex) {
         }
@@ -27,12 +32,18 @@ public class FetcherUtils {
         return playerId;
     }
 
+    /**
+     * @see fetchUuid(String player)
+     */
     public static UUID fetchUuid(Player player) {
         return fetchUuid(player.getName());
     }
 
+    /** Fetches the player name of the UUID.
+     * @param uuid The UUID you want to fetch the player from.
+     * @return The player's name.
+     */
     public static String fetchPlayer(UUID uuid) {
-
         NameFetcher fetcher = new NameFetcher(Arrays.asList(uuid));
         Map<UUID, String> response = null;
 
@@ -46,7 +57,10 @@ public class FetcherUtils {
 
         return playerName;
     }
-    
+
+    /**
+     * @see fetchPlayer(UUID uuid)
+     */
     public static String fetchPlayer(String uuid) {
         return fetchPlayer(UUID.fromString(uuid));
     }

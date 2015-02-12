@@ -11,6 +11,11 @@
     <name>TranxCraft</name>
     <url>https://www.tranxcraft.com/</url>
     <description>The custom plugin for the TranxCraft Minecraft Server</description>
+
+    <organization>
+        <name>TranxCraft</name>
+        <url>https://www.tranxcraft.com/</url>
+    </organization>
     
     <developers>
         <developer>
@@ -98,6 +103,7 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -121,6 +127,16 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.1</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
             </plugin>
         </plugins>
     </build>

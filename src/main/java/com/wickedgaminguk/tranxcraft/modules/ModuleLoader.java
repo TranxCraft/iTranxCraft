@@ -52,44 +52,34 @@ public class ModuleLoader {
         }
 
         for (Class<? extends Module> module : moduleSet) {
-            if (this.modules.containsKey(module.getSimpleName())) {
-                return;
-            }
-            
-            LoggerUtils.info(plugin, "Loading module " + module.getSimpleName());
+            if (!this.modules.containsKey(module.getSimpleName())) {
+                LoggerUtils.info(plugin, "Loading module " + module.getSimpleName());
 
-            if (loadModule(module)) {
-                LoggerUtils.info(plugin, "Loaded Module " + module.getSimpleName() + " successfully");
-            }
-            else {
-                LoggerUtils.severe(plugin, "Issue loading module");
+                if (loadModule(module)) {
+                    LoggerUtils.info(plugin, "Loaded Module " + module.getSimpleName() + " successfully");
+                }
+                else {
+                    LoggerUtils.severe(plugin, "Issue loading module");
+                }
             }
         }
     }
 
     public boolean loadModule(Class<? extends Module> module) {
         try {
-            Constructor<?> constructor = module.getConstructor(TranxCraft.class);
-            Module mod = (Module) constructor.newInstance(plugin);
+            Constructor[] constructors = module.getConstructors();
+            Constructor<?> constructor = null;
+            
+            if (constructors.length > 1) {
+                constructor = module.getConstructor(TranxCraft.class);
+            }
+            
+            Module mod = (constructor != null ? (Module) constructor.newInstance(plugin) : module.newInstance());
+            mod.setup(plugin);
 
             modules.put(mod.getClass().getSimpleName(), mod);
         }
-        catch (InvocationTargetException ex) {
-            LoggerUtils.severe(plugin, "Error loading module " + module.getSimpleName() + " because: ");
-            LoggerUtils.severe(ex);
-            return false;
-        }
-        catch (NoSuchMethodException ex) {
-            LoggerUtils.severe(plugin, "Error loading module " + module.getSimpleName() + " because: ");
-            LoggerUtils.severe(ex);
-            return false;
-        }
-        catch (InstantiationException ex) {
-            LoggerUtils.severe(plugin, "Error loading module " + module.getSimpleName() + " because: ");
-            LoggerUtils.severe(ex);
-            return false;
-        }
-        catch (IllegalAccessException ex) {
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
             LoggerUtils.severe(plugin, "Error loading module " + module.getSimpleName() + " because: ");
             LoggerUtils.severe(ex);
             return false;
@@ -136,11 +126,7 @@ public class ModuleLoader {
             
             return true;
         }
-        catch (IOException ex) {
-            LoggerUtils.severe(plugin, ex);
-            return false;
-        }
-        catch (InvalidDescriptionException ex) {
+        catch (IOException | InvalidDescriptionException ex) {
             LoggerUtils.severe(plugin, ex);
             return false;
         }

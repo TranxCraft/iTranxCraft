@@ -1,11 +1,12 @@
 package com.wickedgaminguk.tranxcraft.modules;
 
-import com.wickedgaminguk.tranxcraft.TranxCraft;
-import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 
-public class Module {
-
-    protected void register(Class<? extends Listener> listener, TranxCraft plugin) {
-        plugin.listenerLoader.loadListener(listener);
+public abstract class Module<T extends Plugin> {
+    
+    protected T plugin;
+    
+    protected void setup(T plugin) {
+        this.plugin = plugin;
     }
 }

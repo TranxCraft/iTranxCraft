@@ -2,17 +2,16 @@ package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Admin;
-import com.wickedgaminguk.tranxcraft.player.AdminManager.AdminType;
-import com.wickedgaminguk.tranxcraft.utils.ValidationUtils;
+import com.wickedgaminguk.tranxcraft.player.Rank;
+import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailModule extends Module {
-
-    private final TranxCraft PLUGIN;
+public class MailModule extends Module<TranxCraft> {
+    
     private final String HOST;
     private final int PORT;
     private final String USER;
@@ -22,9 +21,7 @@ public class MailModule extends Module {
     private SqlModule sqlModule;
     private boolean isEnabled;
 
-    public MailModule(TranxCraft plugin) {
-        this.PLUGIN = plugin;
-        
+    public MailModule() {
         sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         
         HOST = sqlModule.getConfigEntry("mail_host");
@@ -34,12 +31,12 @@ public class MailModule extends Module {
         FROM = sqlModule.getConfigEntry("mail_sender");
     }
 
-    public void sendEmail(AdminType adminType, String subject, String message) {
+    public void sendEmail(Rank rank, String subject, String message) {
         if (!isEnabled) {
             return;
         }
         
-        for (String email : getRecipients(adminType)) {
+        for (String email : getRecipients(rank)) {
             sendEmail(email, subject, message);
         }
     }
@@ -74,15 +71,15 @@ public class MailModule extends Module {
             email.send();
         }
         catch (EmailException ex) {
-            PLUGIN.debugUtils.debug(ex.getStackTrace().toString());
+            plugin.debugUtils.debug(ex.getStackTrace().toString());
         }
     }
     
-    private List<String> getRecipients(AdminType adminType) {
+    private List<String> getRecipients(Rank rank) {
         List<String> recipients = new ArrayList<>();
         
-        for (Admin admin : PLUGIN.adminManager.getAdmins()) {
-            if (admin.getRank().getRankLevel() >= adminType.getRankLevel()) {
+        for (Admin admin : plugin.adminManager.getAdmins()) {
+            if (admin.getRank().getRankLevel() >= rank.getRankLevel()) {
                 if (ValidationUtils.isValidEmail(admin.getEmail())) {
                     recipients.add(admin.getEmail());
                 }
