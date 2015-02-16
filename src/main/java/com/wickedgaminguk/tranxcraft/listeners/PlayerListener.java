@@ -3,6 +3,7 @@ package com.wickedgaminguk.tranxcraft.listeners;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.util.BanUtils;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import net.pravian.bukkitlib.util.ChatUtils;
 import org.apache.commons.lang.WordUtils;
@@ -22,7 +23,7 @@ public class PlayerListener extends Listener<TranxCraft> {
         Player player = event.getPlayer();
 
         if (!event.getHostname().equalsIgnoreCase("play.tranxcraft.com:25565")) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.RED + "Please join on the following address\n" + ChatColor.GOLD + "play.tranxcraft.com");
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, StrUtils.concatenate(ChatColor.RED, "Please join on the following address\n", ChatColor.GOLD, "play.tranxcraft.com"));
         }
         else if (BanUtils.getHardBans().containsKey(player.getUniqueId().toString())) {
             event.disallow(PlayerLoginEvent.Result.KICK_BANNED, ChatUtils.colorize(BanUtils.getHardBans().get(player.getUniqueId().toString())));
@@ -37,7 +38,7 @@ public class PlayerListener extends Listener<TranxCraft> {
         int playerCount = Integer.valueOf(plugin.sqlModule.getStatistic("playercount"));
         playerCount++;
         plugin.sqlModule.setStatistic("playercount", String.valueOf(playerCount));
-        Bukkit.broadcastMessage(ChatColor.BLUE + "[Player Counter] " + playerCount + " players & " + plugin.sqlModule.getRowCount("players") + " unique players have joined in total.");
+        Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.BLUE, "[Player Counter] ", playerCount, " players & ", plugin.sqlModule.getRowCount("players"), " unique players have joined in total."));
         
         if (plugin.adminManager.isAdmin(event.getPlayer().getUniqueId().toString())) {
             Admin admin = Admin.fromUuid(event.getPlayer().getUniqueId().toString());
@@ -47,7 +48,7 @@ public class PlayerListener extends Listener<TranxCraft> {
             }
             else {
                 String rank = admin.getRank().toString().toLowerCase();
-                Bukkit.broadcastMessage(ChatColor.AQUA + admin.getPlayerName() + " is " + ("aeiou".indexOf(rank.charAt(0)) >= 0 ? "an" : "a") + WordUtils.capitalize(rank));
+                Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.AQUA, admin.getPlayerName(), " is ", ("aeiou".indexOf(rank.charAt(0)) >= 0 ? "an" : "a"), WordUtils.capitalize(rank)));
             }
         }
         

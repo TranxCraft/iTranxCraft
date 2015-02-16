@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.player;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +22,10 @@ public class PlayerManager {
         }
         
         return TranxPlayer.loadFromSql(plugin, player.getUniqueId().toString());
+    }
+    
+    public TranxPlayer getPlayer(CommandSender sender) {
+        return getPlayer((Player) sender);
     }
 
     public TranxPlayer[] getPlayers() {

@@ -13,6 +13,7 @@ import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.BanManager;
 import com.wickedgaminguk.tranxcraft.player.PlayerManager;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
+import com.wickedgaminguk.tranxcraft.util.UtilManager;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import net.pravian.bukkitlib.BukkitLib;
 import net.pravian.bukkitlib.command.BukkitCommandHandler;
@@ -26,26 +27,28 @@ import java.util.logging.Level;
 
 public class TranxCraft extends BukkitPlugin {
 
-    public static TranxCraft plugin;
+    public TranxCraft plugin;
     public YamlConfig config;
     public BukkitCommandHandler handler;
     public MySQL database;
     public ListenerLoader listenerLoader;
     public ModuleLoader modLoader;
-    public BanManager banManager;
     public DebugUtils debugUtils;
     public SqlModule sqlModule;
     public WarnModule warnModule;
-    private MailModule mailModule;
+    public MailModule mailModule;
     public TwitterModule twitterModule;
     public AdminManager adminManager;
     public PlayerManager playerManager;
+    public BanManager banManager;
+    public UtilManager utilManager;
 
     @Override
     public void onLoad() {
         plugin = this;
         config = new YamlConfig(plugin, "config.yml");
         handler = new BukkitCommandHandler(plugin);
+        utilManager = new UtilManager(plugin);
     }
 
     @Override
@@ -98,7 +101,7 @@ public class TranxCraft extends BukkitPlugin {
         twitterModule = (TwitterModule) ModuleLoader.getModule("TwitterModule");
 
         banManager = new BanManager(plugin);
-        debugUtils = new DebugUtils(Level.parse(sqlModule.getConfigEntry("loglevel").toUpperCase()));
+        DebugUtils.setLevel(Level.parse(sqlModule.getConfigEntry("loglevel").toUpperCase()));
         debugUtils.test();
         
         if (!ValidationUtils.isValidEmailConfig(sqlModule)) {
@@ -116,6 +119,8 @@ public class TranxCraft extends BukkitPlugin {
         if (database.isOpen()) {
             database.closeConnection();
         }
+        
+        config.save();
     }
 
     @Override

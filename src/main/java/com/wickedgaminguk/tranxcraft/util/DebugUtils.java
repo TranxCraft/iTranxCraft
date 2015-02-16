@@ -1,29 +1,24 @@
 package com.wickedgaminguk.tranxcraft.util;
 
-import com.wickedgaminguk.tranxcraft.TranxCraft;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import java.util.logging.Level;
 
-public class DebugUtils extends Util<TranxCraft> {
+public class DebugUtils extends Util {
     
     private static boolean isEnabled;
     private static Level level;
 
-    public DebugUtils(Level level) {
-        this.level = level;
-    }
-
     /** Tests to see if DebugUtils works in the current configuration.
      * 
      */
-    public void test() {
+    public static void test() {
         plugin.getLogger().log(level, "Testing DebugUtils.");
     }
 
     /** If debug mode is enabled, it will log the message.
      * @param message The message to be logged.
      */
-    public void debug(Object message) {
+    public static void debug(Object message) {
         if (isEnabled()) {
             final String line;
 
@@ -36,6 +31,14 @@ public class DebugUtils extends Util<TranxCraft> {
             
             plugin.getLogger().log(level, line);
         }
+    }
+    
+    public static void setLevel(Level lvl) {
+        level = lvl;
+    }
+    
+    public static Level getLevel() {
+        return level;
     }
 
     /** Checks to see if debug mode is enabled.

@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -41,7 +42,7 @@ public class ModuleLoader {
 
         Set<Class<? extends Module>> moduleSet = modules.getSubTypesOf(Module.class);
 
-        LoggerUtils.info(plugin, "Found " + moduleSet.size() + " modules.");
+        LoggerUtils.info(plugin, StrUtils.concatenate("Found ", moduleSet.size(), " modules."));
         
         //Prioritize SQL Module as others depend on it.
         if (loadModule(SqlModule.class)) {
@@ -53,10 +54,10 @@ public class ModuleLoader {
 
         for (Class<? extends Module> module : moduleSet) {
             if (!this.modules.containsKey(module.getSimpleName())) {
-                LoggerUtils.info(plugin, "Loading module " + module.getSimpleName());
+                LoggerUtils.info(plugin, StrUtils.concatenate("Loading module ", module.getSimpleName()));
 
                 if (loadModule(module)) {
-                    LoggerUtils.info(plugin, "Loaded Module " + module.getSimpleName() + " successfully");
+                    LoggerUtils.info(plugin, StrUtils.concatenate("Loaded Module ", module.getSimpleName(), " successfully"));
                 }
                 else {
                     LoggerUtils.severe(plugin, "Issue loading module");
@@ -80,7 +81,7 @@ public class ModuleLoader {
             modules.put(mod.getClass().getSimpleName(), mod);
         }
         catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
-            LoggerUtils.severe(plugin, "Error loading module " + module.getSimpleName() + " because: ");
+            LoggerUtils.severe(plugin, StrUtils.concatenate("Error loading module ", module.getSimpleName(), " because: "));
             LoggerUtils.severe(ex);
             return false;
         }
@@ -89,17 +90,17 @@ public class ModuleLoader {
     }
 
     public void loadModules(File[] files) {
-        LoggerUtils.info(plugin, "Found " + files.length + " external modules.");
+        LoggerUtils.info(plugin, StrUtils.concatenate("Found ", files.length, " external modules."));
         
         for (File file : files) {
             if (file.isDirectory()) {
-                LoggerUtils.info(plugin, file.getName() + " is a directory.");
+                LoggerUtils.info(plugin, StrUtils.concatenate(file.getName(), " is a directory."));
                 break;
             }
             else {
-                LoggerUtils.info(plugin, "Loading module " + file.getName());
+                LoggerUtils.info(plugin, StrUtils.concatenate("Loading module ", file.getName()));
                 if (loadModule(file)) {
-                    LoggerUtils.info(plugin, "Loaded Module " + file.getName() + " successfully");
+                    LoggerUtils.info(plugin, StrUtils.concatenate("Loaded Module ", file.getName(), " successfully"));
                 }
                 else {
                     LoggerUtils.severe(plugin, "Issue loading module");

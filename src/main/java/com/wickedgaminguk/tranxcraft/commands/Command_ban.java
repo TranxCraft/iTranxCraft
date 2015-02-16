@@ -5,6 +5,7 @@ import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.Ban;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
@@ -40,13 +41,13 @@ public class Command_ban extends BukkitCommand<TranxCraft> {
         Player player = getPlayer(args[0]);
 
         if (player == null) {
-            sender.sendMessage(ChatColor.RED + "That player is either offline, or they do not exist.");
+            sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
             return true;
         }
 
         if (sender instanceof Player) {
             if (player == playerSender) {
-                sender.sendMessage(ChatColor.RED + "Don't try to ban yourself, idiot.");
+                sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "Don't try to ban yourself, idiot."));
                 return true;
             }
         }
@@ -55,7 +56,7 @@ public class Command_ban extends BukkitCommand<TranxCraft> {
         TranxPlayer tranxPlayer = plugin.playerManager.getPlayer(player);
         
         if (adminSender.getRank().getRankLevel() <= tranxPlayer.getRank().getRankLevel()) {
-            sender.sendMessage(ChatColor.RED + "You may not ban " + player.getName());
+            sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "You may not ban ", player.getName()));
             return true;
         }
 
@@ -65,11 +66,11 @@ public class Command_ban extends BukkitCommand<TranxCraft> {
             banReason = StringUtils.join(ArrayUtils.subarray(args, 1, args.length), " ");
         }
 
-        Bukkit.broadcastMessage(ChatColor.RED + sender.getName() + " - banning " + player.getName() + " for " + banReason);
+        Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.RED, sender.getName(), " - banning ", player.getName(), " for ", banReason));
         
         player.setGameMode(GameMode.SURVIVAL);
 
-        player.kickPlayer(ChatColor.RED + "You have been banned by " + sender.getName() + "." + (banReason != null ? ("\nReason: " + ChatColor.YELLOW + banReason) : ""));
+        player.kickPlayer(StrUtils.concatenate(ChatColor.RED, "You have been banned by ", sender.getName(), ".", (banReason != null ? ("\nReason: " + ChatColor.YELLOW + banReason) : "")));
         
         Ban ban = new Ban();
         ban.setAdmin(sender.getName());

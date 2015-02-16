@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -31,7 +32,7 @@ public class WarnModule extends Module<TranxCraft> {
                     in.close();
                 }
                 catch (Exception ex) {
-                    plugin.debugUtils.debug("Error fetching fishbans information from " + url.getHost());
+                    plugin.debugUtils.debug(StrUtils.concatenate("Error fetching fishbans information from ", url.getHost()));
                     plugin.debugUtils.debug(ex.getMessage());
                     return;
                 }
@@ -46,10 +47,10 @@ public class WarnModule extends Module<TranxCraft> {
 
     public URL getUrl(Player player) {
         try {
-            return new URL("http://api.fishbans.com/stats/" + player.getName());
+            return new URL(StrUtils.concatenate("http://api.fishbans.com/stats/", player.getName()));
         }
         catch (MalformedURLException ex) {
-            LoggerUtils.warning("Could not generate fishbans URL for " + player.getName());
+            LoggerUtils.warning(StrUtils.concatenate("Could not generate fishbans URL for ", player.getName()));
             return null;
         }
     }
@@ -87,7 +88,7 @@ public class WarnModule extends Module<TranxCraft> {
                     }
                 }
                 catch (Exception ex) {
-                    plugin.debugUtils.debug("Error parsing fishbans JSON: " + object);
+                    plugin.debugUtils.debug(StrUtils.concatenate("Error parsing fishbans JSON: ", object));
                     plugin.debugUtils.debug(ex.toString());
                 }
             }

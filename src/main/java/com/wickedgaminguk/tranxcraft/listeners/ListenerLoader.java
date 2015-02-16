@@ -38,7 +38,10 @@ public class ListenerLoader {
      */
     public void loadListener(Class<? extends Listener> listener) {
         try {
-            pluginManager.registerEvents(listener.newInstance(), plugin);
+            Listener tListener = listener.newInstance();
+            tListener.setup(plugin);
+            
+            pluginManager.registerEvents(tListener, plugin);
             LoggerUtils.info(plugin, StrUtils.concatenate("Registered Listener ", listener.getSimpleName(), " successfully"));
         }
         catch (InstantiationException | IllegalAccessException ex) {

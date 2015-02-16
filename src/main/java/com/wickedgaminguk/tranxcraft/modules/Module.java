@@ -8,5 +8,10 @@ public abstract class Module<T extends Plugin> {
     
     protected void setup(T plugin) {
         this.plugin = plugin;
+        onLoad();
+    }
+    
+    protected void onLoad() {
+
     }
 }

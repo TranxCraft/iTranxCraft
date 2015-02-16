@@ -3,6 +3,7 @@ package com.wickedgaminguk.tranxcraft.listeners;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,8 +17,9 @@ import java.util.List;
 public class BlockListener extends Listener<TranxCraft> {
     
     private List<String> blockedItems;
-
-    public BlockListener() {
+    
+    @Override
+    public void onLoad() {
         blockedItems = Lists.newArrayList(Splitter.on(",").trimResults().omitEmptyStrings().split(plugin.sqlModule.getConfigEntry("blockeditems")));
     }
 
@@ -26,7 +28,7 @@ public class BlockListener extends Listener<TranxCraft> {
         Player player = event.getPlayer();
 
         if (blockedItems.contains(event.getBlockPlaced().getType()) && plugin.adminManager.isAdmin(player.getUniqueId().toString())) {
-            player.sendMessage(ChatColor.RED + "The Use of " + WordUtils.capitalizeFully(event.getBlockPlaced().getType().toString()) + " is not permitted on TranxCraft.");
+            player.sendMessage(StrUtils.concatenate(ChatColor.RED, "The Use of ", WordUtils.capitalizeFully(event.getBlockPlaced().getType().toString()) + " is not permitted on TranxCraft."));
             player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.COOKIE, 1));
             event.setCancelled(true);
         }

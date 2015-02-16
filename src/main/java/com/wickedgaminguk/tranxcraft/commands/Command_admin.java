@@ -40,7 +40,7 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
         }
         
         if (!arguments.contains(args[0])) {
-            sender.sendMessage(ChatColor.RED + "Invalid option chosen.");
+            sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "Invalid option chosen."));
             return false;
         }
         
@@ -53,25 +53,25 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
                 Player player = getPlayer(args[1]);
 
                 if (player == null) {
-                    sender.sendMessage(ChatColor.RED + "That player is either offline, or they do not exist.");
+                    sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
                     return true;
                 }
 
                 if (AdminManager.isAdmin(player.getUniqueId().toString())) {
-                    sender.sendMessage(ChatColor.RED + "This player is already an admin.");
+                    sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "This player is already an admin."));
                 }
 
                 String rank = args[2].toUpperCase();
 
                 if (!ValidationUtils.isInEnum(rank, Rank.class)) {
-                    sender.sendMessage(ChatColor.RED + "Invalid rank chosen.");
+                    sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "Invalid rank chosen."));
                     return true;
                 }
 
                 Admin adminSender = Admin.fromUuid(playerSender.getUniqueId().toString());
 
                 if (adminSender.getRank().getRankLevel() <= Rank.valueOf(rank).getRankLevel()) {
-                    sender.sendMessage(ChatColor.RED + "You can not add a new admin with a rank equal to or higher than yourself.");
+                    sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "You can not add a new admin with a rank equal to or higher than yourself."));
                 }
 
                 plugin.adminManager.addAdmin(player.getUniqueId().toString(), player.getName(), player.getAddress().getHostString(), Rank.valueOf(rank));

@@ -16,7 +16,8 @@ public class AnnouncementModule extends Module<TranxCraft> {
     private SqlModule sqlModule;
     private static HashMap<String, Integer> announcements = new HashMap<>();
     
-    public AnnouncementModule() {
+    @Override
+    public void onLoad() {
         this.sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         
         ResultSet result = sqlModule.getDatabase().query("SELECT * FROM `announcements`");

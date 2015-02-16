@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.commands;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
@@ -12,7 +13,7 @@ public class Command_tranxcraft extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-        sender.sendMessage("This server is running TranxCraft v" + plugin.getVersion());
+        sender.sendMessage(StrUtils.concatenate("This server is running TranxCraft v", plugin.getVersion()));
         return true;
     }
 }

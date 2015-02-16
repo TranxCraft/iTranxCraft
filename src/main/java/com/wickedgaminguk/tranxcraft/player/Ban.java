@@ -1,5 +1,6 @@
 package com.wickedgaminguk.tranxcraft.player;
 
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import java.time.Instant;
@@ -64,7 +65,8 @@ public class Ban {
     public String buildBanReason() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(Date.from(Instant.ofEpochSecond(Long.valueOf(getExpiry()))));
-        return ChatColor.RED + "You have been banned by " + getAdmin() + "\nfor " + getReason() + "\nThis ban expires on the " + cal.get(Calendar.DAY_OF_MONTH) + cal.get(Calendar.MONTH) + cal.get(Calendar.YEAR);
+        
+        return StrUtils.concatenate(ChatColor.RED, "You have been banned by ", getAdmin(), "\nfor ", getReason(), "\nThis ban expires on the ", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
     }
 
     public String getExpiry() {

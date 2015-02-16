@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -9,15 +10,15 @@ import twitter4j.auth.AccessToken;
 
 public class TwitterModule extends Module<TranxCraft> {
     
-    private TranxCraft plugin;
     private SqlModule sqlModule;
 
-    private final String CONSUMER_KEY;
-    private final String CONSUMER_KEY_SECRET;
-    private final String ACCESS_TOKEN;
-    private final String ACCESS_TOKEN_SECRET;
-    
-    public TwitterModule() {
+    private String CONSUMER_KEY;
+    private String CONSUMER_KEY_SECRET;
+    private String ACCESS_TOKEN;
+    private String ACCESS_TOKEN_SECRET;
+
+    @Override
+    public void onLoad() {
         this.sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         
         this.CONSUMER_KEY = sqlModule.getConfigEntry("twitter_consumerkey");
@@ -39,7 +40,7 @@ public class TwitterModule extends Module<TranxCraft> {
         twitter.setOAuthAccessToken(oathAccessToken);
 
         try {
-            LoggerUtils.info(plugin, "Tweeting: " + tweet);
+            LoggerUtils.info(plugin, StrUtils.concatenate("Tweeting: ", tweet));
             twitter.updateStatus(tweet);
             LoggerUtils.info(plugin, "Successfully tweeted.");
         }

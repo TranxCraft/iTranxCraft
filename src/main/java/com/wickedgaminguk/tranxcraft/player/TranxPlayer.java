@@ -102,6 +102,15 @@ public class TranxPlayer {
         return this.rank.getRankLevel() > rank.getRankLevel();
     }
     
+    public Admin getAdmin() {
+        if (isAdmin()) {
+            return Admin.fromUuid(uuid);
+        }
+        else {
+            return new Admin();
+        }
+    }
+    
     public boolean isAdmin() {
         Admin admin = Admin.fromUuid(uuid);
         

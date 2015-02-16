@@ -1,9 +1,9 @@
 package com.wickedgaminguk.tranxcraft.commands;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
-import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
@@ -36,19 +36,19 @@ public class Command_warn extends BukkitCommand<TranxCraft> {
         Player player = getPlayer(args[0]);
 
         if (player == null) {
-            sender.sendMessage(ChatColor.RED + "That player is either offline, or they do not exist.");
+            sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
             return true;
         }
 
         if (sender instanceof Player) {
             if (player == playerSender) {
-                sender.sendMessage(ChatColor.RED + "Don't try to warn yourself, idiot.");
+                sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "Don't try to warn yourself, idiot."));
                 return true;
             }
 
             if (!tSender.hasRank(Rank.LEADADMIN)) {
-                if (AdminManager.isAdmin(player.getUniqueId().toString())) {
-                    sender.sendMessage(ChatColor.RED + "You may not warn " + player.getName());
+                if (tSender.isAdmin()) {
+                    sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "You may not warn ", player.getName()));
                     return true;
                 }
             }
@@ -56,7 +56,7 @@ public class Command_warn extends BukkitCommand<TranxCraft> {
 
         String message = StringUtils.join(ArrayUtils.subarray(args, 1, args.length), " ");
 
-        player.sendMessage(ChatColor.RED + "[WARNING] " + message);
+        player.sendMessage(StrUtils.concatenate(ChatColor.RED, "[WARNING] ",  message));
 
         return true;
     }
