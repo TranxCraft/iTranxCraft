@@ -2,15 +2,20 @@ package com.wickedgaminguk.tranxcraft.player;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
+import org.bukkit.entity.Player;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class AdminManager {
 
     private TranxCraft plugin;
 
     private static HashMap<String, Admin> adminCache = new HashMap<>();
+    private static List<Player> toggledAdminChat = new ArrayList<>();
 
     public AdminManager(TranxCraft plugin) {
         this.plugin = plugin;
@@ -111,7 +116,15 @@ public class AdminManager {
     }
 
     public Admin[] getAdmins() {
+        if (getAdminCache().isEmpty()) {
+            return new Admin[]{};
+        }
+
         return (Admin[]) getAdminCache().entrySet().toArray();
+    }
+
+    public List<Player> getToggledAdminChat() {
+        return toggledAdminChat;
     }
 
     /** Gets the cache of Admin data.

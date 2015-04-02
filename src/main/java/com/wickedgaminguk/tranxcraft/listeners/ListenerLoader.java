@@ -12,6 +12,8 @@ public class ListenerLoader {
     private TranxCraft plugin;
     private PluginManager pluginManager;
 
+    private static int listenerCount;
+
     public ListenerLoader(TranxCraft plugin) {
         this.plugin = plugin;
         this.pluginManager = plugin.getServer().getPluginManager();
@@ -43,9 +45,14 @@ public class ListenerLoader {
             
             pluginManager.registerEvents(tListener, plugin);
             LoggerUtils.info(plugin, StrUtils.concatenate("Registered Listener ", listener.getSimpleName(), " successfully"));
+            listenerCount++;
         }
         catch (InstantiationException | IllegalAccessException ex) {
             LoggerUtils.severe(plugin, StrUtils.concatenate("Error registering listener ", listener.getSimpleName(), " because ", ex));
         }
+    }
+
+    public static int getListenerCount() {
+        return listenerCount;
     }
 }

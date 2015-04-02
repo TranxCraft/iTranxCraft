@@ -5,16 +5,34 @@ authors: [WickedGamingUK]
 description: The custom developed plugin for TranxCraft.
 website: https://www.tranxcraft.com/
 commands:
-    tranxcraft:
-        usage: /<command>
-        description: Displays useful information about TranxCraft.
-        aliases: [tc]
     admin:
         usage: /<command> <add|set|remove|info|list> <player>
         description: Admin management.
     ban:
         usage: /<command> <player> <reason>
         description: Ban management.
+    commandviewer:
+        usage: /<command>
+        description: Toggles Command Viewer.
+    info:
+        usage: /<command> <player>
+        description: Shows information about a player.
+    o:
+        usage: /<command> <message>
+        description: Sends a message in AdminChat or toggles it.
+    report:
+        usage: /<command> <player> <message>
+        description: Report a player.
+    setloginmessage:
+        usage: /<command> <message>
+        description: Sets your login message.
+    tranxcraft:
+        usage: /<command>
+        description: Displays useful information about TranxCraft.
+        aliases: [tc]
+    unban:
+        usage: /<command> <player>
+        description: Unbans a player.
     warn:
         usage: /<command> <player> <reason>
         description: Warn a player.

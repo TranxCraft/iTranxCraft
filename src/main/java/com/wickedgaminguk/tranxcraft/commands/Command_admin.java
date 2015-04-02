@@ -5,6 +5,7 @@ import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
@@ -23,16 +24,19 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-        TranxPlayer tSender = null;
+        //TranxPlayer tSender = null;
         List<String> arguments = Arrays.asList("add", "set", "remove", "info", "list");
         
-        if (sender instanceof Player) {
-            Player bukkitPlayer = (Player) sender;
-            tSender = TranxPlayer.loadFromSql(plugin, bukkitPlayer.getUniqueId().toString());
+        /*if (sender instanceof Player) {
+            tSender = plugin.playerManager.getPlayer(playerSender);
 
             if (!tSender.hasRank(Rank.MODERATOR)) {
                 return noPerms();
             }
+        }*/
+
+        if (!PlayerUtils.checkPermissions(sender, Rank.MODERATOR)) {
+            return false;
         }
         
         if (args.length == 0) {
@@ -43,14 +47,14 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
             sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "Invalid option chosen."));
             return false;
         }
-        
+
+        Player player = PlayerUtils.getPlayer(args[1]);
+
         switch (args[0]) {
             case "add": {
                 if (args.length != 2) {
                     return false;
                 }
-
-                Player player = getPlayer(args[1]);
 
                 if (player == null) {
                     sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
@@ -83,8 +87,6 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
                     return false;
                 }
 
-                Player player = getPlayer(args[1]);
-
                 if (player == null) {
                     sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
                     return true;
@@ -116,8 +118,6 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
                     return false;
                 }
 
-                Player player = getPlayer(args[1]);
-
                 if (player == null) {
                     sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
                     return true;
@@ -142,8 +142,6 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
                 if (args.length != 1) {
                     return false;
                 }
-
-                Player player = getPlayer(args[1]);
 
                 if (player == null) {
                     sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));

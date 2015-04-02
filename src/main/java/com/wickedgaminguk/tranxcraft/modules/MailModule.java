@@ -25,7 +25,17 @@ public class MailModule extends Module<TranxCraft> {
         sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         
         HOST = sqlModule.getConfigEntry("mail_host");
-        PORT = Integer.valueOf(sqlModule.getConfigEntry("mail_port"));
+
+        String port = sqlModule.getConfigEntry("mail_port");
+
+        if (ValidationUtils.isValidPort(port)) {
+            PORT = Integer.valueOf(port);
+        }
+        else {
+            //Resort to default SMTP port if it can't resolve.
+            PORT = 25;
+        }
+
         USER = sqlModule.getConfigEntry("mail_username");
         PASSWORD = sqlModule.getConfigEntry("mail_password");
         FROM = sqlModule.getConfigEntry("mail_sender");

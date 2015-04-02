@@ -2,6 +2,8 @@ package com.wickedgaminguk.tranxcraft.modules;
 
 import com.visionwarestudios.database.mysql.MySQL;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
+import com.wickedgaminguk.tranxcraft.util.StatisticManager;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,12 +27,14 @@ public class SqlModule extends Module<TranxCraft> {
         return plugin.database;
     }
     
-    public String getEntry(String table, String entry, String value) {
+    public String getEntry(String table, String entry, String value, String columnLabel) {
+        DebugUtils.debug(3, StrUtils.concatenate("SELECT * FROM `", table, "` WHERE `", entry, "` = '", value, "';"));
+
         ResultSet result = getDatabase().query(StrUtils.concatenate("SELECT * FROM `", table, "` WHERE `", entry, "` = '" , value, "';"));
 
         try {
             result.next();
-            return result.getString(value);
+            return result.getString(columnLabel);
         }
         catch (SQLException ex) {
             plugin.debugUtils.debug(ex.getMessage());
@@ -39,27 +43,48 @@ public class SqlModule extends Module<TranxCraft> {
     }
 
     public String getConfigEntry(String entry) {
-        return getEntry("config", "config", entry);
+        return getEntry("config", "config", entry, "entry");
     }
     
     public String getStatistic(String statistic) {
-        return getEntry("statistics", "statistic", statistic);
+        String result = getEntry("statistics", "statistic", statistic, "value");
+
+        if (result.isEmpty()) {
+            return "0";
+        }
+        else {
+            return result;
+        }
     }
     
     public int getRowCount(String table) {
-        ResultSet result = getDatabase().query("SELECT COUNT(*) FROM ?;", table);
-        
+        DebugUtils.debug(3, StrUtils.concatenate("SELECT COUNT(*) FROM `", table, "`;"));
+
+        ResultSet result = getDatabase().query(StrUtils.concatenate("SELECT COUNT(*) FROM `", table, "`;"));
+
         try {
+            if (!result.isBeforeFirst()) {
+                return 0;
+            }
+
             result.next();
-            return result.getInt("rowcount");
+            return result.getInt(1);
         }
         catch (SQLException ex) {
             plugin.debugUtils.debug(ex);
-            return -1;
+            return 0;
         }
     }
 
-    public void setStatistic(String statistic, String value) {
-        getDatabase().update("INSERT INTO `statistics` (`statistic`, `value`) VALUES (?, ?);", statistic, value);
+    public void incrementStatistic(String statistic) {
+        incrementStatistic(statistic, 1);
+    }
+
+    public void incrementStatistic(String statistic, int amount) {
+        DebugUtils.debug(3, StrUtils.concatenate("INSERT INTO `statistics` (`statistic`, `value`) VALUES('", statistic, "', ", amount, ") ON DUPLICATE KEY UPDATE value = value + ", amount));
+
+        //getDatabase().update("INSERT INTO `statistics` (`statistic`, `value`) VALUES('" + statistic + "', " + amount + ") ON DUPLICATE KEY UPDATE value = value + " + amount);
+
+        StatisticManager.addStatistic("INSERT INTO `statistics` (`statistic`, `value`) VALUES(?, ?) ON DUPLICATE KEY UPDATE value = value  + ?", statistic, String.valueOf(amount), String.valueOf(amount));
     }
 }

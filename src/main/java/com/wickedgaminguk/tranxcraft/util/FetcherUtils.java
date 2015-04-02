@@ -10,7 +10,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 public class FetcherUtils extends Util {
@@ -23,7 +29,7 @@ public class FetcherUtils extends Util {
         UUID playerId = null;
 
         try {
-            playerId = UUIDFetcher.getUUIDOf(player);
+            playerId = UuidFetcher.getUUIDOf(player);
             fetchUuid("");
         }
         catch (Exception ex) {
@@ -65,6 +71,94 @@ public class FetcherUtils extends Util {
         return fetchPlayer(UUID.fromString(uuid));
     }
 
+    public static Map<String, Date> fetchNameHistory(UUID uuid) {
+        NameHistory history = new NameHistory(Arrays.asList(uuid));
+        Map<UUID, Map<String, Date>> response = null;
+
+        try {
+            response = history.call();
+        }
+        catch (Exception ex) {
+            DebugUtils.debug(ex);
+        }
+
+        return response.get(uuid);
+    }
+
+    public static Map<String, Date> fetchNameHistory(String uuid) {
+        return fetchNameHistory(UUID.fromString(uuid));
+    }
+
+    public static Map<String, Date> fetchNameHistory(Player player) {
+        return fetchNameHistory(fetchUuid(player));
+    }
+
+    public static class NameHistory implements Callable<Map<UUID, Map<String, Date>>> {
+
+        private static final String PROFILE_URL = "https://api.mojang.com/user/profiles/";
+        private final JSONParser jsonParser = new JSONParser();
+        private final List<UUID> uuids;
+
+        public NameHistory(List<UUID> uuids) {
+            this.uuids = ImmutableList.copyOf(uuids);
+        }
+
+        @Override
+        public Map<UUID, Map<String, Date>> call() throws Exception {
+            Map<UUID, List<String>> result = new HashMap<>();
+            Map<UUID, Map<String, Date>> nameHistoryResult = new HashMap<>();
+
+            for (UUID uuid : uuids) {
+                DebugUtils.debug(3, StrUtils.concatenate("Fetching name history for ", uuid.toString()));
+
+                HttpURLConnection connection = (HttpURLConnection) new URL(StrUtils.concatenate(PROFILE_URL, uuid.toString().replace("-", ""), "/names")).openConnection();
+
+                DebugUtils.debug(3, StrUtils.concatenate("Opened connection with response code ", connection.getResponseCode()));
+
+                JSONArray response = (JSONArray) jsonParser.parse(new InputStreamReader(connection.getInputStream()));
+
+                DebugUtils.debug(3, StrUtils.concatenate("Got JSON response of ", response.toJSONString()));
+
+                List<String> names = new ArrayList<>();
+                Map<String, Date> namesWithLog = new HashMap<>();
+
+                int i = -1;
+                DebugUtils.debug(3, StrUtils.concatenate("Found ", response.size(), " names."));
+
+                while (i < response.size() - 1) {
+                    i++;
+
+                    JSONObject name = (JSONObject) response.get(i);
+
+                    DebugUtils.debug(3, name.toJSONString());
+                    DebugUtils.debug(3, name.get("name"));
+
+                    Long timestamp = (Long) name.get("changedToAt");
+
+                    if (timestamp != null) {
+                        Date changedTo = new Date(timestamp);
+
+                        DebugUtils.debug(3, changedTo.toString());
+
+                        names.add((String) name.get("name"));
+
+                        namesWithLog.put((String) name.get("name"), changedTo);
+                    }
+                    else {
+                        DebugUtils.debug(3, "Not adding name to history, it's the current name.");
+                    }
+                }
+
+                DebugUtils.debug(3, StrUtils.concatenate("Inserting ", names.toString(), " into HashMap with key ", uuid.toString()));
+
+                result.put(uuid, names);
+                nameHistoryResult.put(uuid, namesWithLog);
+            }
+
+            return nameHistoryResult;
+        }
+    }
+
     public static class NameFetcher implements Callable<Map<UUID, String>> {
 
         private static final String PROFILE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/";
@@ -102,7 +196,7 @@ public class FetcherUtils extends Util {
         }
     }
 
-    public static class UUIDFetcher implements Callable<Map<String, UUID>> {
+    public static class UuidFetcher implements Callable<Map<String, UUID>> {
 
         private static final double PROFILES_PER_REQUEST = 100;
         private static final String PROFILE_URL = "https://api.mojang.com/profiles/minecraft";
@@ -110,11 +204,11 @@ public class FetcherUtils extends Util {
         private final List<String> names;
         private final boolean rateLimiting;
 
-        public UUIDFetcher(List<String> names) {
+        public UuidFetcher(List<String> names) {
             this(names, true);
         }
 
-        public UUIDFetcher(List<String> names, boolean rateLimiting) {
+        public UuidFetcher(List<String> names, boolean rateLimiting) {
             this.names = ImmutableList.copyOf(names);
             this.rateLimiting = rateLimiting;
         }
@@ -138,7 +232,7 @@ public class FetcherUtils extends Util {
         }
 
         public static UUID getUUIDOf(String name) throws Exception {
-            return new UUIDFetcher(Arrays.asList(name)).call().get(name);
+            return new UuidFetcher(Arrays.asList(name)).call().get(name);
         }
 
         private static HttpURLConnection createConnection() throws Exception {
@@ -178,7 +272,7 @@ public class FetcherUtils extends Util {
                     JSONObject jsonProfile = (JSONObject) profile;
                     String id = (String) jsonProfile.get("id");
                     String name = (String) jsonProfile.get("name");
-                    UUID uuid = UUIDFetcher.getUUID(id);
+                    UUID uuid = UuidFetcher.getUUID(id);
                     uuidMap.put(name, uuid);
                 }
 

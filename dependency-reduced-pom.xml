@@ -47,7 +47,6 @@
                   <exclude>org.bukkit:bukkit</exclude>
                 </excludes>
               </artifactSet>
-              <minimizeJar>true</minimizeJar>
             </configuration>
           </execution>
         </executions>
@@ -70,6 +69,10 @@
     <repository>
       <id>tranxcraft-repo</id>
       <url>https://github.com/TranxCraft/Maven/raw/master/</url>
+    </repository>
+    <repository>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
   </repositories>
   <dependencies>

@@ -1,6 +1,8 @@
 package com.wickedgaminguk.tranxcraft.player;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.net.InetAddress;
@@ -10,15 +12,15 @@ import java.util.UUID;
 
 public class TranxPlayer {
 
-    private String uuid;
-    private String name;
-    private String latestIp;
-    private String forumName;
+    private String uuid = "Not Set";
+    private String name = "Not Set";
+    private String latestIp = "Not Set";
+    private String forumName = "Not Set";
 
-    private Rank rank;
+    private Rank rank = Rank.UNKNOWN;
 
-    private int kills;
-    private int deaths;
+    private int kills = 0;
+    private int deaths = 0;
 
     public TranxPlayer(String uuid, String player, String latestIp, String forumName, Rank rank, int kills, int deaths) {
         this.uuid = uuid;
@@ -99,7 +101,7 @@ public class TranxPlayer {
     }
     
     public boolean hasRank(Rank rank) {
-        return this.rank.getRankLevel() > rank.getRankLevel();
+        return this.rank.getRankLevel() >= rank.getRankLevel();
     }
     
     public Admin getAdmin() {
@@ -118,43 +120,65 @@ public class TranxPlayer {
     }
 
     public static TranxPlayer loadFromSql(TranxCraft plugin, String uuid) {
+        DebugUtils.debug(3, StrUtils.concatenate("SELECT * FROM `players` WHERE `uuid` = ", uuid));
+
         ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `players` WHERE `uuid` = ?", uuid);
         TranxPlayer player = new TranxPlayer(uuid);
 
         try {
+            if (!result.isBeforeFirst()) {
+                return null;
+            }
+
             result.next();
+
+            DebugUtils.debug(3, DebugUtils.resultSetToJSON(result));
 
             player.setName(result.getString("player"));
             player.setLatestIp(result.getString("latestip"));
             player.setKills(result.getInt("kills"));
             player.setDeaths(result.getInt("deaths"));
+            player.setRank(Rank.valueOf(result.getString("rank").toUpperCase()));
             player.setForumName(result.getString("forumname"));
 
             return player;
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex.getMessage());
-            return player;
+            plugin.debugUtils.debug(ex);
+            return null;
         }
     }
 
     public static TranxPlayer loadFromSql(TranxCraft plugin, InetAddress ip) {
-        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `players` WHERE `ip` = ?", ip.getHostAddress());
+        DebugUtils.debug(3, StrUtils.concatenate("SELECT * FROM `players` WHERE `latestip` = ", ip.getHostAddress()));
+
+        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `players` WHERE `latestip` = ?", ip.getHostAddress());
         TranxPlayer player = new TranxPlayer();
 
         try {
+            if (result == null) {
+                return null;
+            }
+
+            if (!result.isBeforeFirst()) {
+                return null;
+            }
+
+            DebugUtils.debug(3, DebugUtils.resultSetToJSON(result));
+
             result.next();
 
             player.setName(result.getString("player"));
             player.setLatestIp(result.getString("latestip"));
             player.setKills(result.getInt("kills"));
             player.setDeaths(result.getInt("deaths"));
+            player.setRank(Rank.valueOf(result.getString("rank").toUpperCase()));
             player.setForumName(result.getString("forumname"));
 
             return player;
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex.getMessage());
+            plugin.debugUtils.debug(ex);
             return null;
         }
     }

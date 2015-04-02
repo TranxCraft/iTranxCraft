@@ -1,8 +1,10 @@
 package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.ChatUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
@@ -33,12 +35,9 @@ public class WarnModule extends Module<TranxCraft> {
                 }
                 catch (Exception ex) {
                     plugin.debugUtils.debug(StrUtils.concatenate("Error fetching fishbans information from ", url.getHost()));
-                    plugin.debugUtils.debug(ex.getMessage());
+                    plugin.debugUtils.debug(ex);
                     return;
                 }
-
-                plugin.debugUtils.debug(url.toString());
-                plugin.debugUtils.debug(json.toJSONString());
 
                 getWarnRunnable(json).runTask(plugin);
             }
@@ -72,9 +71,7 @@ public class WarnModule extends Module<TranxCraft> {
                         return;
                     }
 
-                    /* TODO: AdminChat
-                    plugin.adminChat.sendAdminMessage("BanWarner", ChatColor.RED + "Warning: " + stats.get("username") + " has been banned " + stats.get("totalbans") + " times!");
-                    */
+                    ChatUtils.sendAdminChatMessage("WarnModule", StrUtils.concatenate(ChatColor.RED, "Warning: ",  stats.get("username"), " has been banned ", stats.get("totalbans"), " times!"));
 
                     final JSONObject services = (JSONObject) stats.get("service");
 
@@ -82,14 +79,13 @@ public class WarnModule extends Module<TranxCraft> {
                         if (services.get(service).equals(0L)) {
                             continue;
                         }
-                        /* TODO: AdminChat
-                        plugin.adminChat.sendAdminMessage("BanWarner", ChatColor.RED + "Warning: " + services.get(service) + " times on " + service);
-                        */
+
+                        ChatUtils.sendAdminChatMessage("WarnModule", StrUtils.concatenate(ChatColor.RED, "Warning: ", services.get(service), " times on ", service));
                     }
                 }
                 catch (Exception ex) {
                     plugin.debugUtils.debug(StrUtils.concatenate("Error parsing fishbans JSON: ", object));
-                    plugin.debugUtils.debug(ex.toString());
+                    plugin.debugUtils.debug(ex);
                 }
             }
         };

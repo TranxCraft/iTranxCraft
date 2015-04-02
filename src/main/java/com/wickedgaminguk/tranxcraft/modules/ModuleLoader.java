@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.plugin.InvalidDescriptionException;
@@ -28,14 +29,6 @@ public class ModuleLoader {
     public ModuleLoader(TranxCraft plugin) {
         this.plugin = plugin;
     }
-
-    public static Module getModule(String name) {
-        return modules.get(name);
-    }
-    
-    public static int getModuleCount() {
-        return modules.size();
-    }
     
     public void loadModules(Package pkg) {
         Reflections modules = new Reflections(pkg);
@@ -52,6 +45,8 @@ public class ModuleLoader {
             LoggerUtils.severe(plugin, "Issue loading module");
         }
 
+        loadModule(AnnouncementModule.class);
+
         for (Class<? extends Module> module : moduleSet) {
             if (!this.modules.containsKey(module.getSimpleName())) {
                 LoggerUtils.info(plugin, StrUtils.concatenate("Loading module ", module.getSimpleName()));
@@ -60,34 +55,15 @@ public class ModuleLoader {
                     LoggerUtils.info(plugin, StrUtils.concatenate("Loaded Module ", module.getSimpleName(), " successfully"));
                 }
                 else {
-                    LoggerUtils.severe(plugin, "Issue loading module");
+                    DebugUtils.debug(1, "Error loading Module.");
                 }
             }
-        }
-    }
-
-    public boolean loadModule(Class<? extends Module> module) {
-        try {
-            Constructor[] constructors = module.getConstructors();
-            Constructor<?> constructor = null;
-            
-            if (constructors.length > 1) {
-                constructor = module.getConstructor(TranxCraft.class);
+            else {
+                DebugUtils.debug(1, StrUtils.concatenate("Not loading module ", module.getSimpleName(), " - it's already loaded."));
             }
-            
-            Module mod = (constructor != null ? (Module) constructor.newInstance(plugin) : module.newInstance());
-            mod.setup(plugin);
-
-            modules.put(mod.getClass().getSimpleName(), mod);
         }
-        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
-            LoggerUtils.severe(plugin, StrUtils.concatenate("Error loading module ", module.getSimpleName(), " because: "));
-            LoggerUtils.severe(ex);
-            return false;
-        }
-
-        return true;
     }
+
 
     public void loadModules(File[] files) {
         LoggerUtils.info(plugin, StrUtils.concatenate("Found ", files.length, " external modules."));
@@ -109,6 +85,28 @@ public class ModuleLoader {
         }
     }
 
+    public boolean loadModule(Class<? extends Module> module) {
+        try {
+            Constructor[] constructors = module.getConstructors();
+            Constructor<?> constructor = null;
+
+            if (constructors.length > 1) {
+                constructor = module.getConstructor(TranxCraft.class);
+            }
+
+            Module mod = (constructor != null ? (Module) constructor.newInstance(plugin) : module.newInstance());
+            mod.setup(plugin);
+
+            modules.put(mod.getClass().getSimpleName(), mod);
+        }
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
+            DebugUtils.debug(1, ex);
+            return false;
+        }
+
+        return true;
+    }
+
     public boolean loadModule(File file) {
         try {
             JarFile jar = new JarFile(file);
@@ -128,8 +126,16 @@ public class ModuleLoader {
             return true;
         }
         catch (IOException | InvalidDescriptionException ex) {
-            LoggerUtils.severe(plugin, ex);
+            DebugUtils.debug(1, ex);
             return false;
         }
+    }
+
+    public static Module getModule(String name) {
+        return modules.get(name);
+    }
+
+    public static int getModuleCount() {
+        return modules.size();
     }
 }

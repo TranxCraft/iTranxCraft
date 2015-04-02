@@ -1,20 +1,20 @@
 package com.wickedgaminguk.tranxcraft.commands;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
-import com.wickedgaminguk.tranxcraft.util.ChatUtils;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
-import net.pravian.bukkitlib.util.StringUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandPermissions(source = SourceType.ANY)
-public class Command_o extends BukkitCommand<TranxCraft> {
+@CommandPermissions(source = SourceType.PLAYER)
+public class Command_commandviewer extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -29,21 +29,12 @@ public class Command_o extends BukkitCommand<TranxCraft> {
             }
         }
 
-        if (args.length == 0) {
-            if (plugin.adminManager.getToggledAdminChat().contains(playerSender)) {
-                plugin.adminManager.getToggledAdminChat().remove(playerSender);
-            }
-            else {
-                plugin.adminManager.getToggledAdminChat().add(playerSender);
-            }
+        Admin admin = Admin.fromUuid(tSender.getUuid());
 
-            return true;
-        }
+        admin.setCommandViewer(!admin.hasCommandViewer());
 
-        String message = StringUtils.join(ArrayUtils.subarray(args, 0, args.length), " ");
+        sender.sendMessage(StrUtils.concatenate(ChatColor.GREEN, "Command Viewer is now ", (admin.hasCommandViewer() ? "enabled" : "disabled"), "."));
 
-        ChatUtils.sendAdminChatMessage(tSender.getName(), message);
-        
         return true;
     }
 }

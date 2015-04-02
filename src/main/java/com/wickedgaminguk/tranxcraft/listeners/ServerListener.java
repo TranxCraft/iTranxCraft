@@ -1,8 +1,11 @@
 package com.wickedgaminguk.tranxcraft.listeners;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.MinecraftUtils;
+import com.wickedgaminguk.tranxcraft.util.StaffUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,31 +21,27 @@ public class ServerListener extends Listener<TranxCraft> {
         
         if (player != null) {
             if (plugin.banManager.isBanned(player.getUuid())) {
-                event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player, ", but you are", ChatColor.BOLD, " banned."));
+                event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player.getName(), ", but you are", ChatColor.BOLD, " banned."));
             }
-            /*TODO: Staff Mode
-            else if (plugin.util.isStaffMode() == true && !(player.isAdmin())) {
-                event.setMotd(ChatColor.RED + "Hey " + player + ", sadly, adminmode is on - come back soon!" + ChatColor.LIGHT_PURPLE + " <3");
+            else if (StaffUtils.getStaffMode() == true && !player.hasRank(Rank.MODERATOR)) {
+                event.setMotd(ChatColor.RED + "Hey " + player.getName() + ", sadly, adminmode is on - come back soon!" + ChatColor.LIGHT_PURPLE + " <3");
             }
-            */
             else if (Bukkit.hasWhitelist() && Bukkit.getWhitelistedPlayers().contains(Bukkit.getOfflinePlayer(player.getName())) == false) {
-                event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player, ", but the whitelist is on - come back soon!", ChatColor.LIGHT_PURPLE, " <3"));
+                event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player.getName(), ", but the whitelist is on - come back soon!", ChatColor.LIGHT_PURPLE, " <3"));
             }
             else if (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers() && !(player.isAdmin())) {
-                event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player, ", but the server is full - come back soon!", ChatColor.LIGHT_PURPLE, " <3"));
+                event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player.getName(), ", but the server is full - come back soon!", ChatColor.LIGHT_PURPLE, " <3"));
             }
             else {
-                event.setMotd(StrUtils.concatenate(ChatColor.GREEN, "Welcome back to ", ChatColor.WHITE, "TranxCraft, ", ChatColor.GREEN, player.getName()));
+                event.setMotd(StrUtils.concatenate(ChatColor.GOLD, "Welcome back to the TranxCraft Private Alpha, ", ChatColor.GREEN, player.getName(), ChatColor.GOLD, "!", ChatColor.DARK_PURPLE, " Craftbukkit ", MinecraftUtils.getMinecraftVersion()));
             }
         }
         else if (plugin.banManager.isBanned(event.getAddress())) {
             event.setMotd(StrUtils.concatenate(ChatColor.RED, "You are banned."));
         }
-        /*TODO: Staff Mode
-        else if (plugin.util.isStaffMode() == true) {
+        else if (StaffUtils.getStaffMode() == true) {
             event.setMotd(ChatColor.RED + "Adminmode enabled.");
         }
-        */
         else if (Bukkit.hasWhitelist()) {
             event.setMotd(StrUtils.concatenate(ChatColor.RED, "The whitelist is enabled."));
         }
@@ -50,7 +49,8 @@ public class ServerListener extends Listener<TranxCraft> {
             event.setMotd(StrUtils.concatenate(ChatColor.RED, "The Server is full."));
         }
         else {
-            event.setMotd(StrUtils.concatenate(ChatColor.GREEN, "TranxCraft", ChatColor.WHITE, " - ", ChatColor.DARK_PURPLE, "Craftbukkit ", MinecraftUtils.getMinecraftVersion()));
+            DebugUtils.debug(1, StrUtils.concatenate("No information found for IP address ", event.getAddress().getHostAddress()));
+            event.setMotd(StrUtils.concatenate(ChatColor.GREEN, "TranxCraft Private Alpha", ChatColor.WHITE, " - ", ChatColor.DARK_PURPLE, "Craftbukkit ", MinecraftUtils.getMinecraftVersion()));
         }
     }
 }

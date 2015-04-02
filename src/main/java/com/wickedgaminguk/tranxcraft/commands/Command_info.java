@@ -3,25 +3,24 @@ package com.wickedgaminguk.tranxcraft.commands;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
-import com.wickedgaminguk.tranxcraft.util.ChatUtils;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
-import net.pravian.bukkitlib.util.StringUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.WordUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @CommandPermissions(source = SourceType.ANY)
-public class Command_o extends BukkitCommand<TranxCraft> {
+public class Command_info extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
         TranxPlayer tSender = null;
 
         if (sender instanceof Player) {
-            Player bukkitPlayer = (Player) sender;
             tSender = plugin.playerManager.getPlayer(sender);
 
             if (!tSender.hasRank(Rank.MODERATOR)) {
@@ -29,21 +28,27 @@ public class Command_o extends BukkitCommand<TranxCraft> {
             }
         }
 
-        if (args.length == 0) {
-            if (plugin.adminManager.getToggledAdminChat().contains(playerSender)) {
-                plugin.adminManager.getToggledAdminChat().remove(playerSender);
-            }
-            else {
-                plugin.adminManager.getToggledAdminChat().add(playerSender);
-            }
+        if (args.length <= 1) {
+            return false;
+        }
 
+        Player player = getPlayer(args[0]);
+
+        if (player == null) {
+            sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
             return true;
         }
 
-        String message = StringUtils.join(ArrayUtils.subarray(args, 0, args.length), " ");
+        TranxPlayer target = plugin.playerManager.getPlayer(player);
 
-        ChatUtils.sendAdminChatMessage(tSender.getName(), message);
-        
+        sender.sendMessage(StrUtils.concatenate("Player info for ", ChatColor.GOLD, target.getName(),
+                "\nUUID: ", target.getUuid(),
+                "\nName: ", target.getName(),
+                "\nForum Name: ", target.getForumName(),
+                "\nLatest IP: ", target.getLatestIp(),
+                "\nRank: ", WordUtils.capitalizeFully(target.getRank().toString().toLowerCase())
+        ));
+
         return true;
     }
 }
