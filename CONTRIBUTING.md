@@ -84,6 +84,11 @@ being loaded into memory. Through the use of a library that issue has been resol
 * Please avoid having to add files main namespace where possible.
 * Please refrain from using an excessive amount of commits. As few as possible is generally the best.
 * Please do not spread your contribution over several pull-requests.
+ 
+
+## I'm interested in becoming an 'official' developer. How?
+
+If you wish to become an official developer, check out the thread on our forums [here](https://www.tranxcraft.com/forums/index.php?/topic/61-how-to-become-an-official-developer/): https://www.tranxcraft.com/forums/index.php?/topic/61-how-to-become-an-official-developer/
 
 ## Additional Resources
 
