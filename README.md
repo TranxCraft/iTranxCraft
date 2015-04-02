@@ -1,5 +1,7 @@
 # iTranxCraft
 
+[![Build Status](https://drone.io/github.com/TranxCraft/iTranxCraft/status.png)](https://drone.io/github.com/TranxCraft/iTranxCraft/latest)
+
 ### Description
 iTranxCraft is the improved version of TranxCraft, the custom plugin that we run on the server to add lots of cool features that we hope will improve the experience for both players and admins on our server.
 
