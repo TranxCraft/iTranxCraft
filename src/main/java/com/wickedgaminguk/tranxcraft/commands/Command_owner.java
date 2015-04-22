@@ -12,7 +12,7 @@ public class Command_owner extends BukkitCommand {
 
 @Override
     public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
-           Player slime = Bukkit.getServer().getPlayer("ImALuckyGuy");
+           Player slime = Bukkit.getServer().getPlayer("Exbice");
            Player player = (Player) sender;
         if (slime != null)
         {
