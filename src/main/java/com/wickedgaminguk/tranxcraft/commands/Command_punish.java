@@ -1,5 +1,6 @@
 package com.wickedgaminguk.tranxcraft.commands;
 
+import net.pravian.bukkitlib.command.BukkitCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
