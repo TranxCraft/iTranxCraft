@@ -3,8 +3,14 @@ package com.wickedgaminguk.tranxcraft.util;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StatisticManager extends BukkitRunnable {
 
@@ -15,27 +21,26 @@ public class StatisticManager extends BukkitRunnable {
 
         LoggerUtils.info(plugin, "StatisticManager instance created successfully.");
     }
-
-    //TODO: Change Map Type to one that allows duplicate entries. Added 21/03/2015
-    private static ConcurrentHashMap<String, String[]> statisticQueue = new ConcurrentHashMap<>();
+    
+    private static List<PreparedStatement> queue = new CopyOnWriteArrayList<>();
 
     @Override
     public void run() {
+        List<PreparedStatement> toRun = Collections.synchronizedList(queue);
+
         LoggerUtils.info(plugin, "Running queue...");
-        LoggerUtils.info(plugin, StrUtils.concatenate("Executing ", statisticQueue.size(), " queries."));
+        LoggerUtils.info(plugin, StrUtils.concatenate("Executing ", toRun.size(), " queries."));
 
-        HashMap<String, String[]> queue = new HashMap<>(statisticQueue);
-
-        for (HashMap.Entry<String, String[]> statistic : queue.entrySet()) {
-            plugin.sqlModule.getDatabase().update(statistic.getKey(), statistic.getValue());
-            statisticQueue.remove(statistic.getKey(), statistic.getValue());
+        for (PreparedStatement statement : toRun) {
+            plugin.sqlModule.execute(statement);
+            queue.remove(statement);
         }
 
         LoggerUtils.info(plugin, "Executed queries.");
     }
 
-    public static void addStatistic(String query, String... params) {
-        statisticQueue.put(query, params);
+    public static void addStatistic(PreparedStatement statement) {
+        queue.add(statement);
         DebugUtils.debug(1, "Added a query to the queue.");
     }
 }

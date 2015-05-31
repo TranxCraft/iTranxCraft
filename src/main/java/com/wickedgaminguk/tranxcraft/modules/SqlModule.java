@@ -5,6 +5,8 @@ import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StatisticManager;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
+
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -76,6 +78,15 @@ public class SqlModule extends Module<TranxCraft> {
         }
     }
 
+    public void execute(PreparedStatement statement) {
+        try {
+            statement.execute();
+        }
+        catch (SQLException ex) {
+            plugin.debugUtils.debug(ex);
+        }
+    }
+
     public void incrementStatistic(String statistic) {
         incrementStatistic(statistic, 1);
     }
@@ -85,6 +96,6 @@ public class SqlModule extends Module<TranxCraft> {
 
         //getDatabase().update("INSERT INTO `statistics` (`statistic`, `value`) VALUES('" + statistic + "', " + amount + ") ON DUPLICATE KEY UPDATE value = value + " + amount);
 
-        StatisticManager.addStatistic("INSERT INTO `statistics` (`statistic`, `value`) VALUES(?, ?) ON DUPLICATE KEY UPDATE value = value  + ?", statistic, String.valueOf(amount), String.valueOf(amount));
+        StatisticManager.addStatistic(getDatabase().prepare("INSERT INTO `statistics` (`statistic`, `value`) VALUES(?, ?) ON DUPLICATE KEY UPDATE value = value  + ?", statistic, String.valueOf(amount), String.valueOf(amount)));
     }
 }
