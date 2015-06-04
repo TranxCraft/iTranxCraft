@@ -8,6 +8,9 @@ commands:
     admin:
         usage: /<command> <add|set|remove|info|list> <player>
         description: Admin management.
+    information:
+        usage: /<command>
+        description: Find information about the plugin and server
     ban:
         usage: /<command> <player> <reason>
         description: Ban management.
