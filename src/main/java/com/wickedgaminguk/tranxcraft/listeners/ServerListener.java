@@ -23,10 +23,10 @@ public class ServerListener extends Listener<TranxCraft> {
             if (plugin.banManager.isBanned(player.getUuid())) {
                 event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player.getName(), ", but you are", ChatColor.BOLD, " banned."));
             }
-            else if (StaffUtils.getStaffMode() == true && !player.hasRank(Rank.MODERATOR)) {
+            else if (StaffUtils.getStaffMode() && !player.hasRank(Rank.MODERATOR)) {
                 event.setMotd(ChatColor.RED + "Hey " + player.getName() + ", sadly, adminmode is on - come back soon!" + ChatColor.LIGHT_PURPLE + " <3");
             }
-            else if (Bukkit.hasWhitelist() && Bukkit.getWhitelistedPlayers().contains(Bukkit.getOfflinePlayer(player.getName())) == false) {
+            else if (Bukkit.hasWhitelist() && !Bukkit.getWhitelistedPlayers().contains(Bukkit.getOfflinePlayer(player.getName()))) {
                 event.setMotd(StrUtils.concatenate(ChatColor.RED, "Sorry ", player.getName(), ", but the whitelist is on - come back soon!", ChatColor.LIGHT_PURPLE, " <3"));
             }
             else if (Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers() && !(player.isAdmin())) {
@@ -39,7 +39,7 @@ public class ServerListener extends Listener<TranxCraft> {
         else if (plugin.banManager.isBanned(event.getAddress())) {
             event.setMotd(StrUtils.concatenate(ChatColor.RED, "You are banned."));
         }
-        else if (StaffUtils.getStaffMode() == true) {
+        else if (StaffUtils.getStaffMode()) {
             event.setMotd(ChatColor.RED + "Adminmode enabled.");
         }
         else if (Bukkit.hasWhitelist()) {

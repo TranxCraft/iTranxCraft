@@ -32,15 +32,7 @@ public class ValidationUtils extends Util {
      * @return Whether the port is valid or not.
      */
     public static boolean isValidPort(String port) {
-        if (!NumberUtils.isInt(port)) {
-            return false;
-        }
-        else if (Integer.valueOf(port) > 0 && Integer.valueOf(port) <= 65535) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return NumberUtils.isInt(port) && Integer.valueOf(port) > 0 && Integer.valueOf(port) <= 65535;
     }
 
     /** Checks to see if a given string is a valid e-mail.
@@ -91,11 +83,11 @@ public class ValidationUtils extends Util {
             return false;
         }
         
-        if (isValidHostname(mySql.getString("hostname")) == false) {
+        if (!isValidHostname(mySql.getString("hostname"))) {
             return false;
         }
 
-        if (isValidPort(mySql.getString("port")) == false) {
+        if (!isValidPort(mySql.getString("port"))) {
             return false;
         }
 

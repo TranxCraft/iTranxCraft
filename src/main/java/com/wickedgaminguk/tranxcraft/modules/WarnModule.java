@@ -2,6 +2,7 @@ package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.util.ChatUtils;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.ChatColor;
@@ -34,8 +35,8 @@ public class WarnModule extends Module<TranxCraft> {
                     in.close();
                 }
                 catch (Exception ex) {
-                    plugin.debugUtils.debug(StrUtils.concatenate("Error fetching fishbans information from ", url.getHost()));
-                    plugin.debugUtils.debug(ex);
+                    DebugUtils.debug(StrUtils.concatenate("Error fetching fishbans information from ", url.getHost()));
+                    DebugUtils.debug(ex);
                     return;
                 }
 
@@ -60,8 +61,8 @@ public class WarnModule extends Module<TranxCraft> {
             public void run() {
                 try {
                     if (object.get("success").equals(false)) {
-                        plugin.debugUtils.debug("Fishbans returned success: false");
-                        plugin.debugUtils.debug(object.get("error").toString());
+                        DebugUtils.debug("Fishbans returned success: false");
+                        DebugUtils.debug(object.get("error").toString());
                         return;
                     }
 
@@ -84,8 +85,8 @@ public class WarnModule extends Module<TranxCraft> {
                     }
                 }
                 catch (Exception ex) {
-                    plugin.debugUtils.debug(StrUtils.concatenate("Error parsing fishbans JSON: ", object));
-                    plugin.debugUtils.debug(ex);
+                    DebugUtils.debug(StrUtils.concatenate("Error parsing fishbans JSON: ", object));
+                    DebugUtils.debug(ex);
                 }
             }
         };

@@ -2,6 +2,7 @@ package com.wickedgaminguk.tranxcraft.player;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Ban;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import net.pravian.bukkitlib.util.TimeUtils;
 import org.bukkit.entity.Player;
 import java.net.InetAddress;
@@ -182,7 +183,7 @@ public class BanManager {
             }
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex.getMessage());
+            DebugUtils.debug(ex.getMessage());
         }
         
         return banCount;

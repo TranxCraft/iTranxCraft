@@ -20,7 +20,6 @@ public class Command_namehistory extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-
         if (args.length != 1) {
             return showUsage();
         }
@@ -52,7 +51,7 @@ public class Command_namehistory extends BukkitCommand<TranxCraft> {
             builder.append(StrUtils.concatenate(ChatColor.GOLD, name.getValue().toString(), ChatColor.WHITE, ": ", ChatColor.AQUA, name.getKey()));
         }
 
-        sender.sendMessage(StrUtils.concatenate(ChatColor.GOLD));
+        sender.sendMessage(StrUtils.concatenate(ChatColor.GOLD, builder.toString()));
 
         return true;
     }

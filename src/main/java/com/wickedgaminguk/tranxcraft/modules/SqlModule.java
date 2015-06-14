@@ -39,7 +39,7 @@ public class SqlModule extends Module<TranxCraft> {
             return result.getString(columnLabel);
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex.getMessage());
+            DebugUtils.debug(ex.getMessage());
             return "";
         }
     }
@@ -83,7 +83,7 @@ public class SqlModule extends Module<TranxCraft> {
             statement.execute();
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
         }
     }
 
@@ -92,7 +92,7 @@ public class SqlModule extends Module<TranxCraft> {
     }
 
     public void incrementStatistic(String statistic, int amount) {
-        DebugUtils.debug(3, StrUtils.concatenate("INSERT INTO `statistics` (`statistic`, `value`) VALUES('", statistic, "', ", amount, ") ON DUPLICATE KEY UPDATE value = value + ", amount));
+        DebugUtils.debug(4, StrUtils.concatenate("INSERT INTO `statistics` (`statistic`, `value`) VALUES('", statistic, "', ", amount, ") ON DUPLICATE KEY UPDATE value = value + ", amount));
 
         //getDatabase().update("INSERT INTO `statistics` (`statistic`, `value`) VALUES('" + statistic + "', " + amount + ") ON DUPLICATE KEY UPDATE value = value + " + amount);
 

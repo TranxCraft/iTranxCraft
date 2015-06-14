@@ -48,7 +48,7 @@ public class ModuleLoader {
         loadModule(AnnouncementModule.class);
 
         for (Class<? extends Module> module : moduleSet) {
-            if (!this.modules.containsKey(module.getSimpleName())) {
+            if (!ModuleLoader.modules.containsKey(module.getSimpleName())) {
                 LoggerUtils.info(plugin, StrUtils.concatenate("Loading module ", module.getSimpleName()));
 
                 if (loadModule(module)) {

@@ -21,7 +21,7 @@ public class StatisticManager extends BukkitRunnable {
 
         LoggerUtils.info(plugin, "StatisticManager instance created successfully.");
     }
-    
+
     private static List<PreparedStatement> queue = new CopyOnWriteArrayList<>();
 
     @Override
@@ -41,6 +41,10 @@ public class StatisticManager extends BukkitRunnable {
 
     public static void addStatistic(PreparedStatement statement) {
         queue.add(statement);
-        DebugUtils.debug(1, "Added a query to the queue.");
+        DebugUtils.debug(4, "Added a query to the queue.");
+    }
+
+    public static boolean hasStatisticsInQueue() {
+        return !queue.isEmpty();
     }
 }

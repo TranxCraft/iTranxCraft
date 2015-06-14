@@ -11,11 +11,7 @@ import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
 import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import com.wickedgaminguk.tranxcraft.modules.TwitterModule;
 import com.wickedgaminguk.tranxcraft.modules.WarnModule;
-import com.wickedgaminguk.tranxcraft.player.AdminManager;
-import com.wickedgaminguk.tranxcraft.player.BanManager;
-import com.wickedgaminguk.tranxcraft.player.PlayerManager;
-import com.wickedgaminguk.tranxcraft.player.RewardBot;
-import com.wickedgaminguk.tranxcraft.player.RewardWorker;
+import com.wickedgaminguk.tranxcraft.player.*;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StatisticManager;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
@@ -108,9 +104,7 @@ public class TranxCraft extends BukkitPlugin {
 
         if (database.isOpen()) {
             if (!sqlModule.isInitialized()) {
-                LoggerUtils.info(plugin, "Initializing database.");
                 sqlModule.initialize();
-                LoggerUtils.info(plugin, "Database initialized.");
             }
         }
         
@@ -149,6 +143,10 @@ public class TranxCraft extends BukkitPlugin {
 
     @Override
     public void onDisable() {
+        for (Admin admin : adminManager.getAdmins()) {
+            admin.save();
+        }
+
         if (database.isOpen()) {
             database.closeConnection();
         }

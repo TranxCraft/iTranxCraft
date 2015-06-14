@@ -9,18 +9,14 @@ import java.util.HashMap;
 
 public class RewardManager {
 
-    private TranxCraft plugin;
-
-    private final HashMap<String, Double> mobValues = new HashMap<>();
-    private final HashMap<Material, Double> itemValues = new HashMap<>();
-
     public RewardManager(TranxCraft plugin) {
-        this.plugin = plugin;
+        TranxCraft plugin1 = plugin;
 
         ResultSet mobResult = plugin.sqlModule.getDatabase().query("SELECT * FROM `reward_players` WHERE `type` = 'mob'");
 
         try {
             while (mobResult.next()) {
+                HashMap<String, Double> mobValues = new HashMap<>();
                 mobValues.put(mobResult.getString("item"), mobResult.getDouble("value"));
             }
         }
@@ -32,6 +28,7 @@ public class RewardManager {
 
         try {
             while (itemResult.next()) {
+                HashMap<Material, Double> itemValues = new HashMap<>();
                 itemValues.put(Material.valueOf(itemResult.getString("item").toUpperCase()), itemResult.getDouble("value"));
             }
         }

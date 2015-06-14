@@ -17,6 +17,7 @@ public class Admin {
     private Rank rank;
     private String email;
     private boolean hasCommandViewer;
+    private boolean initalised;
     private String loginMessage;
 
     /** Gets the UUID of the admin.
@@ -80,6 +81,7 @@ public class Admin {
      */
     public Admin setUuid(String uuid) {
         this.uuid = uuid;
+        save();
         return this;
     }
 
@@ -89,6 +91,7 @@ public class Admin {
      */
     public Admin setPlayerName(String playerName) {
         this.playerName = playerName;
+        save();
         return this;
     }
 
@@ -98,11 +101,14 @@ public class Admin {
      */
     public Admin setIp(String ip) {
         this.ip = ip;
+        save();
         return this;
     }
 
-    public void setLoginMessage(String loginMessage) {
+    public Admin setLoginMessage(String loginMessage) {
         this.loginMessage = loginMessage;
+        save();
+        return this;
     }
 
     /**
@@ -110,6 +116,7 @@ public class Admin {
      */
     public Admin setIp(InetAddress ip) {
         setIp(ip.getHostAddress());
+        save();
         return this;
     }
 
@@ -119,6 +126,7 @@ public class Admin {
      */
     public Admin setRank(Rank rank) {
         this.rank = rank;
+        save();
         return this;
     }
 
@@ -128,23 +136,36 @@ public class Admin {
      */
     public Admin setEmail(String email) {
         this.email = email;
+        save();
         return this;
+    }
+
+    public boolean isInitalised() {
+        return initalised;
+    }
+
+    public void setInitalised(boolean initalised) {
+        this.initalised = initalised;
     }
     
     public boolean hasCommandViewer() {
         return this.hasCommandViewer;        
     }
     
-    public void setCommandViewer(boolean mode) {
+    public Admin setCommandViewer(boolean mode) {
         this.hasCommandViewer = mode;
+        save();
+        return this;
     }
 
     /** Uploads the data to the MySQL server.
      * 
      */
     public void save() {
-        SqlModule sql = (SqlModule) ModuleLoader.getModule("SqlModule");
-        sql.getDatabase().update("UPDATE `admins` SET `player` = ?, `ip` = ?, `rank` = ?, `email` = ? WHERE `uuid` = ?", getPlayerName(), getIp(), getRank().toString().toLowerCase(), getEmail());
+        if (initalised) {
+            SqlModule sql = (SqlModule) ModuleLoader.getModule("SqlModule");
+            sql.getDatabase().update("UPDATE `admins` SET `player` = ?, `ip` = ?, `rank` = ?, `email` = ?, `login_message` = ? WHERE `uuid` = ?", getPlayerName(), getIp(), getRank().toString().toLowerCase(), getEmail(), getLoginMessage(), getUuid());
+        }
     }
     
     @Override

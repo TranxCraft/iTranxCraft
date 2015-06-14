@@ -85,8 +85,6 @@ public class DebugUtils extends Util {
                 rowCount++;
             }
 
-            debug(columnCount);
-
             result.beforeFirst();
 
             JSONArray info = new JSONArray();

@@ -1,5 +1,7 @@
 package com.wickedgaminguk.tranxcraft.util;
 
+import com.wickedgaminguk.tranxcraft.player.Admin;
+import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
 import org.bukkit.Bukkit;
@@ -34,6 +36,18 @@ public class PlayerUtils extends Util {
             return true;
         }
 
+        if (rank.getRankLevel() >= Rank.MODERATOR.getRankLevel()) {
+            if (AdminManager.isAdmin(((Player) sender).getUniqueId().toString())) {
+                if (Admin.fromUuid(((Player) sender).getUniqueId().toString()).getRank().getRankLevel() >= rank.getRankLevel()) {
+                    return true;
+                }
+            }
+        }
+
+        TranxPlayer player = plugin.playerManager.getPlayer(sender);
+
+        DebugUtils.debug(2, player.getName() + " has a rank of " + player.getRank().toString());
+
         if (plugin.playerManager.getPlayer(sender).hasRank(rank)) {
             return true;
         }
@@ -42,19 +56,12 @@ public class PlayerUtils extends Util {
     }
 
     public static boolean checkPermissions(CommandSender sender, String rankType) {
-        if (!(sender instanceof Player)) {
-            return true;
-        }
-
-        if (ValidationUtils.isInEnum(rankType.toUpperCase(), Rank.class)) {
-            if (plugin.playerManager.getPlayer(sender).hasRank(Rank.valueOf(rankType.toUpperCase()))) {
-                return true;
-            }
+        if (ValidationUtils.isInEnum(rankType, Rank.class)) {
+            return checkPermissions(sender, Rank.valueOf(rankType));
         }
         else {
-            DebugUtils.debug(1, StrUtils.concatenate("Invalid rank chosen ", rankType));
+            DebugUtils.debug("Invalid Rank " + rankType);
+            return false;
         }
-
-        return false;
     }
 }

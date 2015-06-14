@@ -128,10 +128,12 @@ public class StatisticsListener extends Listener<TranxCraft> {
     @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         String command = event.getMessage().substring(1).toLowerCase().split(" ")[0];
+
         incrementPlayerStatistic(event.getPlayer(), "commands");
-        incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate("command_", event.getMessage().substring(1).toLowerCase()));
+        incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate("command_", command));
+
         plugin.sqlModule.incrementStatistic("global_player_commands");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_player_command_", event.getMessage().substring(1).toLowerCase()));
+        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_player_command_", command));
     }
 
     @EventHandler

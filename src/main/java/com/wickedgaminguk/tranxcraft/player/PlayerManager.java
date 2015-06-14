@@ -66,7 +66,7 @@ public class PlayerManager {
             plugin.sqlModule.getDatabase().update("INSERT INTO `players` (`uuid`, `player`, `latestip`, `kills`, `deaths`, `forumname`, `rank`) VALUES (?, ?, ?, ?, ?, ?, ?);", player.getUniqueId().toString(), player.getName(), player.getAddress().getHostString(), "0", "0", "Not Set", Rank.PLAYER.toString());
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
         }
     }
 
@@ -90,7 +90,7 @@ public class PlayerManager {
             }
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex.getMessage());
+            DebugUtils.debug(ex.getMessage());
         }
         
         playerCache.putAll(players);

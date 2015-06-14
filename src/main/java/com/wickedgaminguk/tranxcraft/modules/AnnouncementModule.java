@@ -64,7 +64,7 @@ public class AnnouncementModule extends Module<TranxCraft> {
             }
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
         }
     }
 

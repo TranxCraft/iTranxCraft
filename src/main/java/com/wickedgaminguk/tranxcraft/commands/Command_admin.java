@@ -4,7 +4,7 @@ import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
-import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
@@ -12,6 +12,7 @@ import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
 import net.pravian.bukkitlib.util.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,19 +25,10 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-        //TranxPlayer tSender = null;
         List<String> arguments = Arrays.asList("add", "set", "remove", "info", "list");
-        
-        /*if (sender instanceof Player) {
-            tSender = plugin.playerManager.getPlayer(playerSender);
-
-            if (!tSender.hasRank(Rank.MODERATOR)) {
-                return noPerms();
-            }
-        }*/
 
         if (!PlayerUtils.checkPermissions(sender, Rank.MODERATOR)) {
-            return false;
+            return noPerms();
         }
         
         if (args.length == 0) {
@@ -48,11 +40,15 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
             return false;
         }
 
-        Player player = PlayerUtils.getPlayer(args[1]);
+        Player player = null;
+
+        if (!args[0].equals("list")) {
+            player = PlayerUtils.getPlayer(args[1]);
+        }
 
         switch (args[0]) {
             case "add": {
-                if (args.length != 2) {
+                if (args.length != 3) {
                     return false;
                 }
 
@@ -72,18 +68,26 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
                     return true;
                 }
 
-                Admin adminSender = Admin.fromUuid(playerSender.getUniqueId().toString());
+                if (sender instanceof Player) {
+                    Admin adminSender = Admin.fromUuid(playerSender.getUniqueId().toString());
 
-                if (adminSender.getRank().getRankLevel() <= Rank.valueOf(rank).getRankLevel()) {
-                    sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "You can not add a new admin with a rank equal to or higher than yourself."));
+                    if (adminSender.getRank().getRankLevel() <= Rank.valueOf(rank).getRankLevel()) {
+                        sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "You can not add a new admin with a rank equal to or higher than yourself."));
+                    }
+                }
+
+                if (AdminManager.isAdmin(player.getUniqueId().toString())) {
+                    sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "This player is already an admin, please use /admin set instead."));
                 }
 
                 plugin.adminManager.addAdmin(player.getUniqueId().toString(), player.getName(), player.getAddress().getHostString(), Rank.valueOf(rank));
                 sender.sendMessage(StrUtils.concatenate(ChatColor.GREEN, "Added admin ", player.getName(), " successfully."));
+
+                break;
             }
             
             case "set": {
-                if (args.length != 2) {
+                if (args.length != 3) {
                     return false;
                 }
 
@@ -111,10 +115,12 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
                 
                 plugin.adminManager.setAdmin(player.getUniqueId().toString(), Rank.valueOf(rank));
                 sender.sendMessage(StrUtils.concatenate(ChatColor.GREEN, "Added admin ", player.getName(), " successfully."));
+
+                break;
             }
             
             case "remove": {
-                if (args.length != 1) {
+                if (args.length != 2) {
                     return false;
                 }
 
@@ -136,10 +142,12 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
 
                 plugin.adminManager.removeAdmin(player.getUniqueId().toString());
                 sender.sendMessage(StrUtils.concatenate(ChatColor.GREEN, "Removed admin ", player.getName(),  " successfully."));
+
+                break;
             }
             
             case "info": {
-                if (args.length != 1) {
+                if (args.length != 2) {
                     return false;
                 }
 
@@ -150,6 +158,7 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
 
                 if (!AdminManager.isAdmin(player.getUniqueId().toString())) {
                     sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "This player is not an admin."));
+                    return true;
                 }
                 
                 Admin admin = Admin.fromUuid(player.getUniqueId().toString());
@@ -158,13 +167,17 @@ public class Command_admin extends BukkitCommand<TranxCraft> {
                         "\nUUID: ", admin.getUuid(),
                         "\nName: ", admin.getPlayerName(),
                         "\nIP: ", admin.getIp(),
-                        "\nRank: ", admin.getRank().toString(),
+                        "\nRank: ", WordUtils.capitalize(admin.getRank().toString().toLowerCase()),
                         "\nE-mail: ", admin.getEmail()
                 ));
+
+                break;
             }
             
             case "list": {
                 sender.sendMessage(StrUtils.concatenate("Admins:\n", ChatColor.GOLD, StringUtils.join(plugin.adminManager.getAdmins(), ", ")));
+
+                break;
             }
         }
         

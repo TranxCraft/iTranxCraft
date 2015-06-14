@@ -7,7 +7,7 @@ public class UtilManager {
     private static TranxCraft plugin;
     
     public UtilManager(TranxCraft plugin) {
-        this.plugin = plugin;
+        UtilManager.plugin = plugin;
     }
     
     public static TranxCraft getPlugin() {

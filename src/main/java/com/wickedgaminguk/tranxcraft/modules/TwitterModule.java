@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.modules;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import twitter4j.Twitter;
@@ -9,8 +10,6 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 
 public class TwitterModule extends Module<TranxCraft> {
-    
-    private SqlModule sqlModule;
 
     private String CONSUMER_KEY;
     private String CONSUMER_KEY_SECRET;
@@ -19,7 +18,7 @@ public class TwitterModule extends Module<TranxCraft> {
 
     @Override
     public void onLoad() {
-        this.sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
+        SqlModule sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         
         this.CONSUMER_KEY = sqlModule.getConfigEntry("twitter_consumerkey");
         this.CONSUMER_KEY_SECRET = sqlModule.getConfigEntry("twitter_consumerkeysecret");
@@ -46,7 +45,7 @@ public class TwitterModule extends Module<TranxCraft> {
         }
         catch (TwitterException ex) {
             LoggerUtils.warning(plugin, "Failed to Submit Tweet.");
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
         }
     }
 }

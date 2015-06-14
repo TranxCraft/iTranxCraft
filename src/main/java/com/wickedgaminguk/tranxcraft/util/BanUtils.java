@@ -9,7 +9,7 @@ public class BanUtils extends Util {
             .put("3d4ad828721f44a4b6e1a18aeac31f88", "xXWilee999Xx, you are a pot stirring fuck, you're not allowed on TranxCraft, ever.")
             .build();
     
-    public static final Map<String, String> getHardBans() {
+    public static Map<String, String> getHardBans() {
         return HARD_BANS;
     }
 }

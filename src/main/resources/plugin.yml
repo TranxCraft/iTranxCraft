@@ -6,7 +6,7 @@ description: The custom developed plugin for TranxCraft.
 website: https://www.tranxcraft.com/
 commands:
     admin:
-        usage: /<command> <add|set|remove|info|list> <player>
+        usage: /<command> <add|set|remove|info|list> <player> <rank>
         description: Admin management.
     ban:
         usage: /<command> <player> <reason>

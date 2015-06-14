@@ -3,6 +3,7 @@ package com.wickedgaminguk.tranxcraft.commands;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
@@ -18,21 +19,15 @@ public class Command_info extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-        TranxPlayer tSender = null;
-
-        if (sender instanceof Player) {
-            tSender = plugin.playerManager.getPlayer(sender);
-
-            if (!tSender.hasRank(Rank.MODERATOR)) {
-                return noPerms();
-            }
+        if (!PlayerUtils.checkPermissions(sender, Rank.MODERATOR)) {
+            return noPerms();
         }
 
-        if (args.length <= 1) {
+        if (args.length != 1) {
             return false;
         }
 
-        Player player = getPlayer(args[0]);
+        Player player = PlayerUtils.getPlayer(args[0]);
 
         if (player == null) {
             sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "That player is either offline, or they do not exist."));
@@ -46,7 +41,7 @@ public class Command_info extends BukkitCommand<TranxCraft> {
                 "\nName: ", target.getName(),
                 "\nForum Name: ", target.getForumName(),
                 "\nLatest IP: ", target.getLatestIp(),
-                "\nRank: ", WordUtils.capitalizeFully(target.getRank().toString().toLowerCase())
+                "\nRank: ", WordUtils.capitalize(target.getRank().toString().toLowerCase())
         ));
 
         return true;

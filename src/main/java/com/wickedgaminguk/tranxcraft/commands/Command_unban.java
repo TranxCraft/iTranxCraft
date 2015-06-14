@@ -4,6 +4,7 @@ import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
 import com.wickedgaminguk.tranxcraft.util.FetcherUtils;
+import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
@@ -19,15 +20,8 @@ public class Command_unban extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-        TranxPlayer tSender = null;
-
-        if (sender instanceof Player) {
-            Player bukkitPlayer = (Player) sender;
-            tSender = plugin.playerManager.getPlayer(bukkitPlayer);
-
-            if (!tSender.hasRank(Rank.MODERATOR)) {
-                return noPerms();
-            }
+        if (!PlayerUtils.checkPermissions(sender, Rank.MODERATOR)) {
+            return noPerms();
         }
 
         if (args.length <= 1) {

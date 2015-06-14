@@ -59,9 +59,7 @@ public class FetcherUtils extends Util {
         catch (Exception ex) {
         }
 
-        String playerName = response.get(uuid);
-
-        return playerName;
+        return response.get(uuid);
     }
 
     /**

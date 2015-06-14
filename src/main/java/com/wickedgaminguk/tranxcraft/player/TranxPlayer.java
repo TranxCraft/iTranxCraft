@@ -1,6 +1,8 @@
 package com.wickedgaminguk.tranxcraft.player;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
+import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import org.bukkit.Bukkit;
@@ -46,6 +48,7 @@ public class TranxPlayer {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+        save();
     }
 
     public String getName() {
@@ -54,6 +57,7 @@ public class TranxPlayer {
 
     public void setName(String player) {
         this.name = player;
+        save();
     }
 
     public String getLatestIp() {
@@ -62,6 +66,7 @@ public class TranxPlayer {
 
     public void setLatestIp(String latestIp) {
         this.latestIp = latestIp;
+        save();
     }
 
     public String getForumName() {
@@ -70,6 +75,7 @@ public class TranxPlayer {
 
     public void setForumName(String forumName) {
         this.forumName = forumName;
+        save();
     }
 
     public int getKills() {
@@ -78,6 +84,7 @@ public class TranxPlayer {
 
     public void setKills(int kills) {
         this.kills = kills;
+        save();
     }
 
     public int getDeaths() {
@@ -86,6 +93,7 @@ public class TranxPlayer {
 
     public void setDeaths(int deaths) {
         this.deaths = deaths;
+        save();
     }
 
     public Rank getRank() {
@@ -94,6 +102,7 @@ public class TranxPlayer {
 
     public void setRank(Rank rank) {
         this.rank = rank;
+        save();
     }
     
     public Player getPlayer() {
@@ -117,6 +126,14 @@ public class TranxPlayer {
         Admin admin = Admin.fromUuid(uuid);
         
         return admin.getRank() != null;
+    }
+
+    /** Uploads the data to the MySQL server.
+     *
+     */
+    public void save() {
+        SqlModule sql = (SqlModule) ModuleLoader.getModule("SqlModule");
+        sql.getDatabase().update("UPDATE `players` SET `player` = ?, `latestip` = ?, `rank` = ?, `kills` = ?, `deaths` = ?, `forumname` = ? WHERE `uuid` = ?", getName(), getLatestIp(), getRank().toString().toLowerCase(), String.valueOf(getKills()), String.valueOf(getDeaths()), getForumName(), getUuid());
     }
 
     public static TranxPlayer loadFromSql(TranxCraft plugin, String uuid) {
@@ -144,7 +161,7 @@ public class TranxPlayer {
             return player;
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
             return null;
         }
     }
@@ -168,6 +185,8 @@ public class TranxPlayer {
 
             result.next();
 
+            DebugUtils.debug(result.getString("rank"));
+
             player.setName(result.getString("player"));
             player.setLatestIp(result.getString("latestip"));
             player.setKills(result.getInt("kills"));
@@ -178,7 +197,7 @@ public class TranxPlayer {
             return player;
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
             return null;
         }
     }

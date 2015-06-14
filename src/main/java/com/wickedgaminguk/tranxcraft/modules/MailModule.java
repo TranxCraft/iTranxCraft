@@ -3,6 +3,7 @@ package com.wickedgaminguk.tranxcraft.modules;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.Rank;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
@@ -17,12 +18,11 @@ public class MailModule extends Module<TranxCraft> {
     private final String USER;
     private final String PASSWORD;
     private final String FROM;
-    
-    private SqlModule sqlModule;
+
     private boolean isEnabled;
 
     public MailModule() {
-        sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
+        SqlModule sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         
         HOST = sqlModule.getConfigEntry("mail_host");
 
@@ -81,7 +81,7 @@ public class MailModule extends Module<TranxCraft> {
             email.send();
         }
         catch (EmailException ex) {
-            plugin.debugUtils.debug(ex.getStackTrace().toString());
+            DebugUtils.debug(ex.getStackTrace().toString());
         }
     }
     

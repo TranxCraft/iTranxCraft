@@ -2,6 +2,7 @@ package com.wickedgaminguk.tranxcraft.listeners;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Admin;
+import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.RewardPlayerData;
 import com.wickedgaminguk.tranxcraft.util.BanUtils;
@@ -28,8 +29,6 @@ public class PlayerListener extends Listener<TranxCraft> {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-
-        LoggerUtils.info(plugin, event.getHostname());
 
         if (!event.getHostname().contains("tranxcraft.com")) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, StrUtils.concatenate(ChatColor.RED, "Please join on the following address\n", ChatColor.GOLD, "play.tranxcraft.com"));
@@ -58,7 +57,7 @@ public class PlayerListener extends Listener<TranxCraft> {
 
         Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.BLUE, "[Player Counter] ", playerCount, " players & ", plugin.sqlModule.getRowCount("players"), " unique players have joined in total."));
 
-        if (plugin.adminManager.isAdmin(event.getPlayer().getUniqueId().toString())) {
+        if (AdminManager.isAdmin(event.getPlayer().getUniqueId().toString())) {
             Admin admin = Admin.fromUuid(event.getPlayer().getUniqueId().toString());
             
             if (ValidationUtils.exists(admin.getLoginMessage())) {
@@ -66,7 +65,7 @@ public class PlayerListener extends Listener<TranxCraft> {
             }
             else {
                 String rank = admin.getRank().toString().toLowerCase();
-                Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.AQUA, admin.getPlayerName(), " is ", ("aeiou".indexOf(rank.charAt(0)) >= 0 ? "an" : "a"), WordUtils.capitalize(rank)));
+                Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.AQUA, admin.getPlayerName(), " is ", ("aeiou".indexOf(rank.charAt(0)) >= 0 ? "an " : "a "), WordUtils.capitalize(rank)));
             }
         }
         

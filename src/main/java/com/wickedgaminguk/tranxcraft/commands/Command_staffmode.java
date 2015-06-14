@@ -3,6 +3,7 @@ package com.wickedgaminguk.tranxcraft.commands;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import com.wickedgaminguk.tranxcraft.util.StaffUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
@@ -21,15 +22,8 @@ public class Command_staffmode extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-        TranxPlayer tSender = null;
-
-        if (sender instanceof Player) {
-            Player bukkitPlayer = (Player) sender;
-            tSender = plugin.playerManager.getPlayer(bukkitPlayer);
-
-            if (!tSender.hasRank(Rank.ADMIN)) {
-                return noPerms();
-            }
+        if (!PlayerUtils.checkPermissions(sender, Rank.MODERATOR)) {
+            return noPerms();
         }
 
         if (args.length > 1) {
@@ -48,7 +42,7 @@ public class Command_staffmode extends BukkitCommand<TranxCraft> {
             return true;
         }
         else if (mode.equals("enable") || mode.equals("on")) {
-            if (StaffUtils.getStaffMode() != true) {
+            if (!StaffUtils.getStaffMode()) {
                 StaffUtils.setStaffMode(sender.getName(), true);
             }
             else {
@@ -56,7 +50,7 @@ public class Command_staffmode extends BukkitCommand<TranxCraft> {
             }
         }
         else {
-            if (StaffUtils.getStaffMode() != false) {
+            if (StaffUtils.getStaffMode()) {
                 StaffUtils.setStaffMode(sender.getName(), false);
             }
             else {

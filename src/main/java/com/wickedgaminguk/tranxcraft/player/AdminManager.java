@@ -1,6 +1,7 @@
 package com.wickedgaminguk.tranxcraft.player;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import org.bukkit.entity.Player;
 
@@ -31,18 +32,15 @@ public class AdminManager {
             }
         }
         catch (SQLException ex) {
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
         }
 
         return admins;
     }
 
     public void addAdmin(String uuid, String player, String ip, Rank rank) {
-        if (getAdminCache().containsKey(uuid)) {
-            return;
-        }
-        else {
-            plugin.sqlModule.getDatabase().update("INSERT IF NOT EXISTS INTO `admins` (`uuid`, `player`, `ip`, `rank`) VALUES (?, ?, ?, ?)", uuid, player, ip, rank.toString().toLowerCase());
+        if (!getAdminCache().containsKey(uuid)) {
+            plugin.sqlModule.getDatabase().update("INSERT INTO `admins` (`uuid`, `player`, `ip`, `rank`) VALUES (?, ?, ?, ?)", uuid, player, ip, rank.toString().toLowerCase());
             getAdminCache().put(uuid, new Admin().setUuid(uuid).setPlayerName(player).setIp(ip).setRank(rank));
         }
     }
@@ -69,7 +67,7 @@ public class AdminManager {
             }
         }
         catch(SQLException ex) {
-            plugin.debugUtils.debug(ex);
+            DebugUtils.debug(ex);
         }
         
         return adminCount;
@@ -79,8 +77,6 @@ public class AdminManager {
         Admin admin = new Admin();
 
         try {
-            result.next();
-
             admin.setUuid(result.getString("uuid"));
             admin.setPlayerName(result.getString("player"));
             admin.setIp(result.getString("ip"));
@@ -92,9 +88,10 @@ public class AdminManager {
             admin.setEmail(result.getString("email"));
 
             getAdminCache().put(admin.getUuid(), admin);
+            admin.setInitalised(true);
         }
         catch (SQLException ex) {
-
+            DebugUtils.debug(ex);
         }
         
         return admin;
@@ -105,7 +102,7 @@ public class AdminManager {
     }
 
     public Admin loadAdmin(String uuid, boolean overrideCache) {
-        if (overrideCache == true) {
+        if (overrideCache) {
             getAdminCache().remove(uuid);
         }
         else if (getAdminCache().containsKey(uuid)) {
@@ -120,7 +117,7 @@ public class AdminManager {
             return new Admin[]{};
         }
 
-        return (Admin[]) getAdminCache().entrySet().toArray();
+        return (getAdminCache().values().toArray(new Admin[getAdminCache().values().size()]));
     }
 
     public List<Player> getToggledAdminChat() {
@@ -134,14 +131,11 @@ public class AdminManager {
         return adminCache;
     }
 
-    public static void clearAdminCache() {
+    public void reloadCache() {
         adminCache.clear();
+        loadCache();
     }
 
-    public static void reloadAdminCache() {
-        clearAdminCache();
-    }
-    
     public static boolean isAdmin(String uuid) {
         return getAdminCache().containsKey(uuid);
     }

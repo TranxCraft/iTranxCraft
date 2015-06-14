@@ -11,14 +11,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class RewardWorker extends BukkitRunnable {
 
-    private final TranxCraft plugin;
-    private final Server server;
-
     private static Long lastRan = null;
 
     public RewardWorker(TranxCraft instance) {
-        this.plugin = instance;
-        this.server = plugin.getServer();
+        TranxCraft plugin = instance;
 
         LoggerUtils.info(plugin, "RewardWorker instance created successfully.");
     }

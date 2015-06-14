@@ -1,15 +1,12 @@
 package com.wickedgaminguk.tranxcraft.util;
 
+import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ChatUtils extends Util {
     
     public static void sendAdminChatMessage(String sender, String message) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (plugin.adminManager.isAdmin(player.getUniqueId().toString())) {
-                player.sendMessage(net.pravian.bukkitlib.util.ChatUtils.colorize(StrUtils.concatenate("&f[&bADMIN&f]&b ", sender, ": &b ", message)));
-            }
-        }
+        Bukkit.getOnlinePlayers().stream().filter(player -> AdminManager.isAdmin(player.getUniqueId().toString())).forEach(player -> player.sendMessage(net.pravian.bukkitlib.util.ChatUtils.colorize(StrUtils.concatenate("&f[&bADMIN&f]&4 ", sender, ": &b", message))));
     }
 }

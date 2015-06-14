@@ -16,14 +16,10 @@ public class StaffUtils extends Util {
     public static void setStaffMode(String sender, boolean mode) {
         staffMode = mode;
 
-        if (mode == true) {
+        if (mode) {
             Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.RED, sender, " - Closing the server to all non staff players."));
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!plugin.playerManager.getPlayer(player).hasRank(Rank.MODERATOR)) {
-                    player.kickPlayer(StrUtils.concatenate(ChatColor.RED, "Sorry ", ChatColor.GOLD, player.getName(), ChatColor.RED, " Staff Mode has been enabled. Please come back later."));
-                }
-            }
+            Bukkit.getOnlinePlayers().stream().filter(player -> !plugin.playerManager.getPlayer(player).hasRank(Rank.MODERATOR)).forEach(player -> player.kickPlayer(StrUtils.concatenate(ChatColor.RED, "Sorry ", ChatColor.GOLD, player.getName(), ChatColor.RED, " Staff Mode has been enabled. Please come back later.")));
         }
         else {
             Bukkit.broadcastMessage(StrUtils.concatenate(ChatColor.AQUA, sender, " - Opening the server to all players."));

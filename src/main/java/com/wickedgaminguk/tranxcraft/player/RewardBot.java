@@ -20,19 +20,16 @@ import java.util.Random;
 public class RewardBot extends BukkitRunnable {
 
     private final List<ItemStack> rewardPool = new ArrayList<>();
-    private final TranxCraft plugin;
     private final Server server;
 
     private Random random = new Random();
 
-    private static Long lastRan = null;
     private static int runCounter;
 
     public RewardBot(TranxCraft instance) {
-        this.plugin = instance;
-        this.server = plugin.getServer();
+        this.server = instance.getServer();
 
-        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `reward_pool`");
+        ResultSet result = instance.sqlModule.getDatabase().query("SELECT * FROM `reward_pool`");
 
         try {
             while (result.next()) {
@@ -43,12 +40,12 @@ public class RewardBot extends BukkitRunnable {
             DebugUtils.debug(ex);
         }
 
-        LoggerUtils.info(plugin, "RewardBot instance created successfully.");
+        LoggerUtils.info(instance, "RewardBot instance created successfully.");
     }
 
     @Override
     public void run() {
-        lastRan = System.currentTimeMillis();
+        Long lastRan = System.currentTimeMillis();
         runCounter++;
 
         Collection<? extends Player> onlinePlayers = server.getOnlinePlayers();
@@ -85,8 +82,6 @@ public class RewardBot extends BukkitRunnable {
     }
 
     private ItemStack getRandomReward() {
-        ItemStack randomItem = rewardPool.get(random.nextInt(rewardPool.size()));
-
-        return randomItem;
+        return rewardPool.get(random.nextInt(rewardPool.size()));
     }
 }

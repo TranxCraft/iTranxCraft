@@ -25,7 +25,7 @@ public class IpBoard {
                     .setId(result.getInt("member_id"))
                     .setMemberGroupId(result.getInt("member_group_id"))
                     .setEmail(result.getString("email"))
-                    .setJoined(Long.valueOf(result.getInt("joined")))
+                    .setJoined((long) result.getInt("joined"))
                     .setIpAddress(result.getString("ip_address"))
                     .setPosts(result.getInt("posts"))
                     .setTitle(result.getString("title"))
@@ -33,7 +33,7 @@ public class IpBoard {
                     .setDisplayName(result.getString("members_display_name"))
                     .setWarnLevel(result.getInt("warn_level"))
                     .setLastWarn(result.getInt("warn_lastwarn"))
-                    .setLastPost(Long.valueOf(result.getInt("last_post")));
+                    .setLastPost((long) result.getInt("last_post"));
         }
         catch (SQLException ex) {
             LoggerUtils.warning(plugin, StrUtils.concatenate("Error getting user information for user ", username, ex.getCause()));
@@ -46,12 +46,7 @@ public class IpBoard {
         ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `TranxCraftForum`.`TranxForum_core_members` WHERE name=?", username);
 
         try {
-            if (!result.isBeforeFirst()) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return result.isBeforeFirst();
         }
         catch (SQLException ex) {
             DebugUtils.debug(2, ex);

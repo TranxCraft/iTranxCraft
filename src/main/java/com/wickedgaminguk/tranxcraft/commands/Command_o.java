@@ -4,6 +4,7 @@ import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
 import com.wickedgaminguk.tranxcraft.util.ChatUtils;
+import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
@@ -18,15 +19,8 @@ public class Command_o extends BukkitCommand<TranxCraft> {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
-        TranxPlayer tSender = null;
-
-        if (sender instanceof Player) {
-            Player bukkitPlayer = (Player) sender;
-            tSender = plugin.playerManager.getPlayer(sender);
-
-            if (!tSender.hasRank(Rank.MODERATOR)) {
-                return noPerms();
-            }
+        if (!PlayerUtils.checkPermissions(sender, Rank.MODERATOR)) {
+            return noPerms();
         }
 
         if (args.length == 0) {
@@ -42,7 +36,7 @@ public class Command_o extends BukkitCommand<TranxCraft> {
 
         String message = StringUtils.join(ArrayUtils.subarray(args, 0, args.length), " ");
 
-        ChatUtils.sendAdminChatMessage(tSender.getName(), message);
+        ChatUtils.sendAdminChatMessage(sender.getName(), message);
         
         return true;
     }
