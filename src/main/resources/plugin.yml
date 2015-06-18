@@ -51,3 +51,15 @@ commands:
     warplist:
         usage: /<command>
         description: Lists all available warps.
+    pwarp:
+        usage: /<command> <warp>
+        description: Warps to a personally pre-defined place.
+    psetwarp:
+        usage: /<command> <warp>
+        description: Set's a personal warp point.
+    pdelwarp:
+        usage: /<command> <warp>
+        description: Deletes a personal warp.
+    pwarplist:
+        usage: /<command>
+        description: Lists all available personal warps.

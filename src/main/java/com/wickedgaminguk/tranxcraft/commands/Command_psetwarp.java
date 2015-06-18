@@ -1,19 +1,16 @@
 package com.wickedgaminguk.tranxcraft.commands;
 
-import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.WarpUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
 import net.pravian.bukkitlib.command.CommandPermissions;
 import net.pravian.bukkitlib.command.SourceType;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 @CommandPermissions(source = SourceType.PLAYER)
-public class Command_warp extends BukkitCommand {
+public class Command_psetwarp extends BukkitCommand {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -21,14 +18,9 @@ public class Command_warp extends BukkitCommand {
             return showUsage();
         }
 
-        Location warp = WarpUtils.getGlobalWarp(args[0]);
+        WarpUtils.addPersonalWarp(playerSender.getUniqueId().toString(), args[0], playerSender.getLocation());
 
-        if (warp == null) {
-            sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "The warp ", ChatColor.DARK_RED, args[0], ChatColor.RED, " can not be found or does not exist."));
-            return true;
-        }
-
-        playerSender.teleport(warp, TeleportCause.COMMAND);
+        sender.sendMessage(StrUtils.concatenate(ChatColor.AQUA, "Warp ", ChatColor.DARK_AQUA, args[0], ChatColor.AQUA, " has been created successfully."));
 
         return true;
     }

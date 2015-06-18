@@ -1,6 +1,5 @@
 package com.wickedgaminguk.tranxcraft.commands;
 
-import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.WarpUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
@@ -13,7 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 @CommandPermissions(source = SourceType.PLAYER)
-public class Command_warp extends BukkitCommand {
+public class Command_pwarp extends BukkitCommand {
 
     @Override
     public boolean run(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -21,7 +20,7 @@ public class Command_warp extends BukkitCommand {
             return showUsage();
         }
 
-        Location warp = WarpUtils.getGlobalWarp(args[0]);
+        Location warp = WarpUtils.getPersonalWarp(playerSender.getUniqueId().toString(), args[0]);
 
         if (warp == null) {
             sender.sendMessage(StrUtils.concatenate(ChatColor.RED, "The warp ", ChatColor.DARK_RED, args[0], ChatColor.RED, " can not be found or does not exist."));
