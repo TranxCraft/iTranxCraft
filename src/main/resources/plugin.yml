@@ -36,3 +36,18 @@ commands:
     warn:
         usage: /<command> <player> <reason>
         description: Warn a player.
+    namehistory:
+        usage: /<command> <player>
+        description: Shows the name history of a player.
+    warp:
+        usage: /<command> <warp>
+        description: Warps to a pre-defined place.
+    setwarp:
+        usage: /<command> <warp>
+        description: Set's a warp point.
+    delwarp:
+        usage: /<command> <warp>
+        description: Deletes a warp.
+    warplist:
+        usage: /<command>
+        description: Lists all available warps.
