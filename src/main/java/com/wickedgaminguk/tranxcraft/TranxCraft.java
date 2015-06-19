@@ -12,8 +12,13 @@ import com.wickedgaminguk.tranxcraft.modules.PushoverModule;
 import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import com.wickedgaminguk.tranxcraft.modules.TwitterModule;
 import com.wickedgaminguk.tranxcraft.modules.WarnModule;
-import com.wickedgaminguk.tranxcraft.player.*;
-import com.wickedgaminguk.tranxcraft.rest.Rest;
+import com.wickedgaminguk.tranxcraft.player.Admin;
+import com.wickedgaminguk.tranxcraft.player.AdminManager;
+import com.wickedgaminguk.tranxcraft.player.BanManager;
+import com.wickedgaminguk.tranxcraft.player.PlayerManager;
+import com.wickedgaminguk.tranxcraft.player.Rank;
+import com.wickedgaminguk.tranxcraft.player.RewardBot;
+import com.wickedgaminguk.tranxcraft.player.RewardWorker;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StatisticManager;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
@@ -28,8 +33,6 @@ import net.pushover.client.MessagePriority;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.restlet.data.Protocol;
-
 import java.io.File;
 import java.util.logging.Level;
 
@@ -79,8 +82,7 @@ public class TranxCraft extends BukkitPlugin {
 
         if (database.isOpen()) {
             LoggerUtils.info(plugin, "Database connection opened.");
-        }
-        else {
+        } else {
             LoggerUtils.severe(plugin, "Database failed to open. This plugin will now disable.");
             Bukkit.getPluginManager().disablePlugin(plugin);
 
@@ -91,10 +93,10 @@ public class TranxCraft extends BukkitPlugin {
 
         listenerLoader = new ListenerLoader(plugin);
         modLoader = new ModuleLoader(plugin);
-        
+
         adminManager = new AdminManager(plugin);
         playerManager = new PlayerManager(plugin);
-        
+
         modLoader.loadModules(SqlModule.class.getPackage());
         sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
 
@@ -113,7 +115,7 @@ public class TranxCraft extends BukkitPlugin {
                 sqlModule.initialize();
             }
         }
-        
+
         warnModule = (WarnModule) ModuleLoader.getModule("WarnModule");
         mailModule = (MailModule) ModuleLoader.getModule("MailModule");
         twitterModule = (TwitterModule) ModuleLoader.getModule("TwitterModule");
@@ -140,7 +142,7 @@ public class TranxCraft extends BukkitPlugin {
         new StatisticManager(plugin).runTaskTimerAsynchronously(plugin, 30 * 20L, 30 * 20L);
 
         ipBoard = new IpBoard(plugin);
-        
+
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", ModuleLoader.getModuleCount(), " modules."));
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", ListenerLoader.getListenerCount(), " listeners."));
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", AnnouncementModule.getAnnouncementCount(), " announcements."));
@@ -159,7 +161,7 @@ public class TranxCraft extends BukkitPlugin {
         if (database.isOpen()) {
             database.closeConnection();
         }
-        
+
         config.save();
     }
 
