@@ -86,9 +86,11 @@ public class AdminManager {
             }
             
             admin.setEmail(result.getString("email"));
+            admin.setLoginMessage(result.getString("login_message"));
+            admin.setPushKey(result.getString("pushover_key"));
 
             getAdminCache().put(admin.getUuid(), admin);
-            admin.setInitalised(true);
+            admin.setInitialised(true);
         }
         catch (SQLException ex) {
             DebugUtils.debug(ex);

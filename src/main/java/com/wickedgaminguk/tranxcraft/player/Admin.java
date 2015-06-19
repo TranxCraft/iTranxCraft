@@ -17,8 +17,9 @@ public class Admin {
     private Rank rank;
     private String email;
     private boolean hasCommandViewer;
-    private boolean initalised;
+    private boolean initialised;
     private String loginMessage;
+    private String pushKey;
 
     /** Gets the UUID of the admin.
      * @return The UUID of the admin.
@@ -140,12 +141,22 @@ public class Admin {
         return this;
     }
 
-    public boolean isInitalised() {
-        return initalised;
+    public String getPushKey() {
+        return pushKey;
     }
 
-    public void setInitalised(boolean initalised) {
-        this.initalised = initalised;
+    public Admin setPushKey(String pushKey) {
+        this.pushKey = pushKey;
+        save();
+        return this;
+    }
+
+    public boolean isInitialised() {
+        return initialised;
+    }
+
+    public void setInitialised(boolean initialised) {
+        this.initialised = initialised;
     }
     
     public boolean hasCommandViewer() {
@@ -162,9 +173,9 @@ public class Admin {
      * 
      */
     public void save() {
-        if (initalised) {
+        if (initialised) {
             SqlModule sql = (SqlModule) ModuleLoader.getModule("SqlModule");
-            sql.getDatabase().update("UPDATE `admins` SET `player` = ?, `ip` = ?, `rank` = ?, `email` = ?, `login_message` = ? WHERE `uuid` = ?", getPlayerName(), getIp(), getRank().toString().toLowerCase(), getEmail(), getLoginMessage(), getUuid());
+            sql.getDatabase().update("UPDATE `admins` SET `player` = ?, `ip` = ?, `rank` = ?, `email` = ?, `login_message` = ?, `pushover_key` = ? WHERE `uuid` = ?", getPlayerName(), getIp(), getRank().toString().toLowerCase(), getEmail(), getLoginMessage(), getPushKey(), getUuid());
         }
     }
     

@@ -4,6 +4,7 @@ import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import net.pushover.client.MessagePriority;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,7 @@ public class PlayerUtils extends Util {
         broadcastMessage(StrUtils.concatenate(ChatColor.RED, "[REPORTS] ", ChatColor.GOLD, sender.getName(), " has reported ", player.getName(), " for ", report), Rank.MODERATOR);
         plugin.sqlModule.getDatabase().update("INSERT INTO `reports` (`sender`, `player`, `report`, `status`) VALUES (?, ?, ?, 'open');", sender.getName(), player.getName(), report);
         plugin.mailModule.sendEmail(Rank.MODERATOR, StrUtils.concatenate("[TranxCraft] ", player.getName(), " has been reported."), StrUtils.concatenate("Hi Admin,<br>", player.getName(), " has been reported by ", sender.getName(), " for ", report));
+        plugin.pushoverModule.sendNotifications(Rank.MODERATOR, MessagePriority.NORMAL, StrUtils.concatenate(player.getName(), " has been reported."), StrUtils.concatenate(player.getName(), " has been reported by ", sender.getName(), " for ", report));
     }
 
     public static void broadcastMessage(String message, Rank rank) {

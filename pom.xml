@@ -117,6 +117,12 @@
             <artifactId>org.restlet</artifactId>
             <version>2.2-RC4</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.sps.pushover.net</groupId>
+            <artifactId>pushover-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>

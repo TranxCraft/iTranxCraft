@@ -8,10 +8,12 @@ import com.wickedgaminguk.tranxcraft.listeners.PlayerListener;
 import com.wickedgaminguk.tranxcraft.modules.AnnouncementModule;
 import com.wickedgaminguk.tranxcraft.modules.MailModule;
 import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
+import com.wickedgaminguk.tranxcraft.modules.PushoverModule;
 import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import com.wickedgaminguk.tranxcraft.modules.TwitterModule;
 import com.wickedgaminguk.tranxcraft.modules.WarnModule;
 import com.wickedgaminguk.tranxcraft.player.*;
+import com.wickedgaminguk.tranxcraft.rest.Rest;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StatisticManager;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
@@ -22,9 +24,12 @@ import net.pravian.bukkitlib.command.BukkitCommandHandler;
 import net.pravian.bukkitlib.config.YamlConfig;
 import net.pravian.bukkitlib.implementation.BukkitPlugin;
 import net.pravian.bukkitlib.util.LoggerUtils;
+import net.pushover.client.MessagePriority;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.restlet.data.Protocol;
+
 import java.io.File;
 import java.util.logging.Level;
 
@@ -41,6 +46,7 @@ public class TranxCraft extends BukkitPlugin {
     public WarnModule warnModule;
     public MailModule mailModule;
     public TwitterModule twitterModule;
+    public PushoverModule pushoverModule;
     public AdminManager adminManager;
     public PlayerManager playerManager;
     public BanManager banManager;
@@ -111,6 +117,7 @@ public class TranxCraft extends BukkitPlugin {
         warnModule = (WarnModule) ModuleLoader.getModule("WarnModule");
         mailModule = (MailModule) ModuleLoader.getModule("MailModule");
         twitterModule = (TwitterModule) ModuleLoader.getModule("TwitterModule");
+        pushoverModule = (PushoverModule) ModuleLoader.getModule("PushoverModule");
 
         banManager = new BanManager(plugin);
 
@@ -139,6 +146,8 @@ public class TranxCraft extends BukkitPlugin {
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", AnnouncementModule.getAnnouncementCount(), " announcements."));
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", banManager.loadCache(), " bans."));
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", adminManager.loadCache(), " admins."));
+
+        pushoverModule.sendNotifications(Rank.MODERATOR, MessagePriority.NORMAL, "Server started", "TranxCraft has been started successfully.");
     }
 
     @Override

@@ -131,4 +131,12 @@ public class ValidationUtils extends Util {
     public static boolean isValidUuid(String uuid) {
         return uuid.matches("[a-f0-9]{8}-[a-f0-9]{4}-4[0-9]{3}-[89ab][a-f0-9]{3}-[0-9a-f]{12}");
     }
+
+    /** Checks to see if the given PushOver Key is of a correct format.
+     * @param key The key you wish to check.
+     * @return Whether the key is valid or not.
+     */
+    public static boolean isValidPushKey(String key) {
+        return key.length() == 30;
+    }
 }
