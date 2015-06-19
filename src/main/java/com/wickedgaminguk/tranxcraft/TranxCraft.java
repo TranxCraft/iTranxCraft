@@ -82,7 +82,8 @@ public class TranxCraft extends BukkitPlugin {
 
         if (database.isOpen()) {
             LoggerUtils.info(plugin, "Database connection opened.");
-        } else {
+        }
+        else {
             LoggerUtils.severe(plugin, "Database failed to open. This plugin will now disable.");
             Bukkit.getPluginManager().disablePlugin(plugin);
 

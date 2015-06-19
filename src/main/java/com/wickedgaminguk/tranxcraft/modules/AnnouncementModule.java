@@ -7,6 +7,7 @@ import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import net.pravian.bukkitlib.util.ChatUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import java.sql.ResultSet;
@@ -82,7 +83,18 @@ public class AnnouncementModule extends Module<TranxCraft> {
         for (HashMap.Entry<String, Integer> announcement : announcements.entrySet()) {
             long interval = announcement.getValue() * 20L;
 
-            scheduler.runTaskTimer(plugin, () -> Bukkit.broadcastMessage(ChatUtils.colorize(announcement.getKey())), interval, interval);
+            scheduler.runTaskTimer(plugin, () -> sendAnnouncement(announcement.getKey()), interval, interval);
+        }
+    }
+
+    public void sendAnnouncement(String announcement) {
+        if (announcement.contains("{%player%}")) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.sendMessage(ChatUtils.colorize(announcement.replace("{%player%}", player.getName())));
+            }
+        }
+        else {
+            Bukkit.broadcastMessage(ChatUtils.colorize(announcement));
         }
     }
     
