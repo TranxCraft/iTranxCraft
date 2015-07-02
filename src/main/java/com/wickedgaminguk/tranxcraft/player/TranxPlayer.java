@@ -5,11 +5,14 @@ import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
 import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
+import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.net.InetAddress;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TranxPlayer {
@@ -19,12 +22,17 @@ public class TranxPlayer {
     private String latestIp = "Not Set";
     private String forumName = "Not Set";
 
+    private Friend[] friends = null;
+
     private Rank rank = Rank.UNKNOWN;
 
     private int kills = 0;
     private int deaths = 0;
+    private int votes = 0;
 
-    public TranxPlayer(String uuid, String player, String latestIp, String forumName, Rank rank, int kills, int deaths) {
+    private double currency = 0;
+
+    public TranxPlayer(String uuid, String player, String latestIp, String forumName, Rank rank, int kills, int deaths, int votes, double currency) {
         this.uuid = uuid;
         this.name = player;
         this.latestIp = latestIp;
@@ -32,6 +40,7 @@ public class TranxPlayer {
         this.rank = rank;
         this.kills = kills;
         this.deaths = deaths;
+        this.votes = votes;
     }
 
     public TranxPlayer(String uuid) {
@@ -46,73 +55,116 @@ public class TranxPlayer {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public TranxPlayer setUuid(String uuid) {
         this.uuid = uuid;
         save();
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String player) {
+    public TranxPlayer setName(String player) {
         this.name = player;
         save();
+        return this;
     }
 
     public String getLatestIp() {
         return latestIp;
     }
 
-    public void setLatestIp(String latestIp) {
+    public TranxPlayer setLatestIp(String latestIp) {
         this.latestIp = latestIp;
         save();
+        return this;
     }
 
     public String getForumName() {
         return forumName;
     }
 
-    public void setForumName(String forumName) {
+    public TranxPlayer setForumName(String forumName) {
         this.forumName = forumName;
         save();
+        return this;
     }
 
     public int getKills() {
         return kills;
     }
 
-    public void setKills(int kills) {
+    public TranxPlayer setKills(int kills) {
         this.kills = kills;
         save();
+        return this;
     }
 
     public int getDeaths() {
         return deaths;
     }
 
-    public void setDeaths(int deaths) {
+    public TranxPlayer setDeaths(int deaths) {
         this.deaths = deaths;
         save();
+        return this;
     }
 
     public Rank getRank() {
         return rank;
     }
 
-    public void setRank(Rank rank) {
+    public TranxPlayer setRank(Rank rank) {
         this.rank = rank;
         save();
+        return this;
     }
-    
+
+    public int getVotes() {
+        return votes;
+    }
+
+    public TranxPlayer setVotes(int votes) {
+        this.votes = votes;
+        save();
+        return this;
+    }
+
+    public Friend[] getFriends() {
+        return friends;
+    }
+
+    public TranxPlayer setFriends(Friend[] friends) {
+        this.friends = friends;
+        save();
+        return this;
+    }
+
+    public double getCurrency() {
+        return currency;
+    }
+
+    public TranxPlayer setCurrency(double currency) {
+        this.currency = currency;
+        save();
+        return this;
+    }
+
+    public TranxPlayer addToCurrency(double currency) {
+        this.currency += currency;
+        save();
+        return this;
+    }
+
     public Player getPlayer() {
         return Bukkit.getPlayer(UUID.fromString(getUuid()));
     }
-    
+
     public boolean hasRank(Rank rank) {
         return this.rank.getRankLevel() >= rank.getRankLevel();
     }
-    
+
     public Admin getAdmin() {
         if (isAdmin()) {
             return Admin.fromUuid(uuid);
@@ -121,19 +173,19 @@ public class TranxPlayer {
             return new Admin();
         }
     }
-    
+
     public boolean isAdmin() {
         Admin admin = Admin.fromUuid(uuid);
-        
+
         return admin.getRank() != null;
     }
 
-    /** Uploads the data to the MySQL server.
-     *
+    /**
+     * Uploads the data to the MySQL server.
      */
     public void save() {
         SqlModule sql = (SqlModule) ModuleLoader.getModule("SqlModule");
-        sql.getDatabase().update("UPDATE `players` SET `player` = ?, `latestip` = ?, `rank` = ?, `kills` = ?, `deaths` = ?, `forumname` = ? WHERE `uuid` = ?", getName(), getLatestIp(), getRank().toString().toLowerCase(), String.valueOf(getKills()), String.valueOf(getDeaths()), getForumName(), getUuid());
+        sql.getDatabase().update("UPDATE `players` SET `player` = ?, `latestip` = ?, `rank` = ?, `kills` = ?, `deaths` = ?, `forumname` = ?, `votes` = ?, `currency` = ? WHERE `uuid` = ?", getName(), getLatestIp(), getRank().toString().toLowerCase(), String.valueOf(getKills()), String.valueOf(getDeaths()), getForumName(), String.valueOf(getVotes()), String.valueOf(getCurrency()), getUuid());
     }
 
     public static TranxPlayer loadFromSql(TranxCraft plugin, String uuid) {
@@ -143,6 +195,10 @@ public class TranxPlayer {
         TranxPlayer player = new TranxPlayer(uuid);
 
         try {
+            if (result == null) {
+                return null;
+            }
+
             if (!result.isBeforeFirst()) {
                 return null;
             }
@@ -151,12 +207,15 @@ public class TranxPlayer {
 
             DebugUtils.debug(3, DebugUtils.resultSetToJSON(result));
 
-            player.setName(result.getString("player"));
-            player.setLatestIp(result.getString("latestip"));
-            player.setKills(result.getInt("kills"));
-            player.setDeaths(result.getInt("deaths"));
-            player.setRank(Rank.valueOf(result.getString("rank").toUpperCase()));
-            player.setForumName(result.getString("forumname"));
+            player.setName(result.getString("player"))
+                    .setLatestIp(result.getString("latestip"))
+                    .setKills(result.getInt("kills"))
+                    .setDeaths(result.getInt("deaths"))
+                    .setRank(Rank.valueOf(result.getString("rank").toUpperCase()))
+                    .setForumName(result.getString("forumname"))
+                    .setVotes(result.getInt("votes"))
+                    .setFriends(getFriends(result.getString("friends")))
+                    .setCurrency(result.getDouble("currency"));
 
             return player;
         }
@@ -185,20 +244,40 @@ public class TranxPlayer {
 
             result.next();
 
-            DebugUtils.debug(result.getString("rank"));
-
-            player.setName(result.getString("player"));
-            player.setLatestIp(result.getString("latestip"));
-            player.setKills(result.getInt("kills"));
-            player.setDeaths(result.getInt("deaths"));
-            player.setRank(Rank.valueOf(result.getString("rank").toUpperCase()));
-            player.setForumName(result.getString("forumname"));
+            player.setName(result.getString("player"))
+                    .setLatestIp(result.getString("latestip"))
+                    .setKills(result.getInt("kills"))
+                    .setDeaths(result.getInt("deaths"))
+                    .setRank(Rank.valueOf(result.getString("rank").toUpperCase()))
+                    .setForumName(result.getString("forumname"))
+                    .setVotes(result.getInt("votes"))
+                    .setFriends(getFriends(result.getString("friends")))
+                    .setCurrency(result.getDouble("currency"));
 
             return player;
         }
         catch (SQLException ex) {
             DebugUtils.debug(ex);
             return null;
+        }
+    }
+
+    public static Friend[] getFriends(String result) {
+        if (result != null && !result.isEmpty()) {
+            String[] friendsString = StrUtils.removeWhitespace(result).split(",");
+
+            List<Friend> friends = new ArrayList<>();
+
+            for (String friend : friendsString) {
+                if (ValidationUtils.isValidUuid(friend)) {
+                    friends.add(new Friend(friend));
+                }
+            }
+
+            return new Friend[friends.size()];
+        }
+        else {
+            return new Friend[]{};
         }
     }
 }

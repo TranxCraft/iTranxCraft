@@ -26,12 +26,22 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 public class PlayerListener extends Listener<TranxCraft> {
 
+    private String hostname;
+
+    @Override
+    public void onLoad() {
+        hostname = plugin.sqlModule.getConfigEntry("hostname");
+    }
+
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
-        if (!event.getHostname().contains("tranxcraft.com")) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, StrUtils.concatenate(ChatColor.RED, "Please join on the following address\n", ChatColor.GOLD, "play.tranxcraft.com"));
+        if (hostname != null && !hostname.isEmpty()) {
+            if (!event.getHostname().contains(hostname.substring(hostname.indexOf('.') + 1))) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, StrUtils.concatenate(ChatColor.RED, "Please join on the following address\n", ChatColor.GOLD, hostname));
+            }
         }
 
         if (BanUtils.getHardBans().containsKey(player.getUniqueId().toString())) {
@@ -51,6 +61,8 @@ public class PlayerListener extends Listener<TranxCraft> {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
+        event.setJoinMessage(StrUtils.concatenate(ChatColor.YELLOW, event.getPlayer().getName(), " has joined from ", plugin.geoIpModule.formatMessage(plugin.geoIpModule.getInfo(event.getPlayer().getAddress().getAddress()))));
+
         plugin.sqlModule.incrementStatistic("global_player_joins");
         int playerCount = Integer.valueOf(plugin.sqlModule.getStatistic("global_player_joins"));
         plugin.playerManager.insertPlayer(event.getPlayer());

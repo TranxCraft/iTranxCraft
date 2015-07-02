@@ -13,16 +13,13 @@ public class DebugUtils extends Util {
     private static int debugLevel = 1;
     private static Level level = Level.INFO;
 
-    public static void debug(int level, Object message) {
-            if (debugLevel >= level) {
-                debug(message);
-            }
-    }
+    public static void debug(int level, String reporter, Object message) {
+        if (plugin.sqlModule != null) {
+            plugin.sqlModule.getDatabase().update("INSERT INTO `debug_log` (`level`, `reporter`, `message`) VALUES (?, ?, ?);", String.valueOf(level), reporter, message.toString());
+        }
 
-    /** If debug mode is enabled, it will log the message.
-     * @param message The message to be logged.
-     */
-    public static void debug(Object message) {
+        WriteUtils.log(DebugUtils.level, plugin, message.toString());
+
         if (isEnabled()) {
             final String line;
 
@@ -32,9 +29,22 @@ public class DebugUtils extends Util {
             else {
                 line = String.valueOf(message);
             }
-            
-            plugin.getLogger().log(level, line);
+
+            if (debugLevel >= level) {
+                plugin.getLogger().log(DebugUtils.level, line);
+            }
         }
+    }
+
+    public static void debug(int level, Object message) {
+        debug(level, "SYSTEM", message);
+    }
+
+    /** If debug mode is enabled, it will log the message. It logs to the database and file regardless.
+     * @param message The message to be logged.
+     */
+    public static void debug(Object message) {
+        debug(1, "SYSTEM", message);
     }
     
     public static void setLevel(Level lvl) {
@@ -119,3 +129,4 @@ public class DebugUtils extends Util {
         return json.toJSONString();
     }
 }
+

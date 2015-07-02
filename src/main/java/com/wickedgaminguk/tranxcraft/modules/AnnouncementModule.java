@@ -3,6 +3,7 @@ package com.wickedgaminguk.tranxcraft.modules;
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.NumberUtils;
+import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import net.pravian.bukkitlib.util.ChatUtils;
 import net.pravian.bukkitlib.util.LoggerUtils;
@@ -15,15 +16,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 public class AnnouncementModule extends Module<TranxCraft> {
-    
-    private SqlModule sqlModule;
+
     private BukkitScheduler scheduler;
 
     private static HashMap<String, Integer> announcements;
-    
+    private static SqlModule sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
+
     @Override
     public void onLoad() {
-        sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
         scheduler = Bukkit.getServer().getScheduler();
         announcements = new HashMap<>();
 
@@ -96,6 +96,45 @@ public class AnnouncementModule extends Module<TranxCraft> {
         else {
             Bukkit.broadcastMessage(ChatUtils.colorize(announcement));
         }
+    }
+
+    public static void addAnnouncement(String name, String announcement, int interval) {
+        sqlModule.getDatabase().update("INSERT INTO `announcements` (`name`, `announcement`, `interval`) VALUES (?, ?, ?);", name, announcement, String.valueOf(interval));
+    }
+
+    public static void removeAnnouncement(String name) {
+        sqlModule.getDatabase().update("DELETE FROM `announcements` WHERE `name` = ?;", name);
+    }
+
+    public static HashMap<String, Integer> getAnnouncements(String... names) {
+        if (names[0].equals("*")) {
+            return announcements;
+        }
+
+        HashMap<String, Integer> announcements = new HashMap<>();
+
+        for (String name : names) {
+            try {
+                ResultSet result = sqlModule.getDatabase().query("SELECT * FROM `announcements` WHERE `name` = ?;", name);
+
+                if (result == null) {
+                    return null;
+                }
+
+                if (!result.isBeforeFirst()) {
+                    return null;
+                }
+
+                result.next();
+
+                announcements.put(result.getString("announcement"), result.getInt("interval"));
+            }
+            catch (SQLException ex) {
+                DebugUtils.debug(ex);
+            }
+        }
+
+        return announcements;
     }
     
     public static int getAnnouncementCount() {

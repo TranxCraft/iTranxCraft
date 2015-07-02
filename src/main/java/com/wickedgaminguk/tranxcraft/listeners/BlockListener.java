@@ -28,7 +28,7 @@ public class BlockListener extends Listener<TranxCraft> {
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
 
-        if (blockedItems.contains(event.getBlockPlaced().getType()) && AdminManager.isAdmin(player.getUniqueId().toString())) {
+        if (blockedItems.contains(event.getBlockPlaced().getType().toString()) && AdminManager.isAdmin(player.getUniqueId().toString())) {
             player.sendMessage(StrUtils.concatenate(ChatColor.RED, "The Use of ", WordUtils.capitalizeFully(event.getBlockPlaced().getType().toString()) + " is not permitted on TranxCraft."));
             player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.COOKIE, 1));
             event.setCancelled(true);

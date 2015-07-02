@@ -11,4 +11,13 @@ public class StrUtils extends Util {
 
         return builder.toString();
     }
+
+    public static String removeWhitespace(String string) {
+        if (string != null && !string.isEmpty()) {
+            return string.replaceAll("\\s+", "");
+        }
+        else {
+            return string;
+        }
+    }
 }

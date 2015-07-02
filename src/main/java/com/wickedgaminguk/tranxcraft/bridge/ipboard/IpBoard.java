@@ -18,7 +18,7 @@ public class IpBoard {
     public User getUser(String username) {
         User user = new User();
 
-        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `TranxCraftForum`.`TranxForum_core_members` WHERE name=?", username);
+        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `TranxCraftForum`.`TranxForum_core_members` WHERE name = ?", username);
 
         try {
             user.setUsername(result.getString("name"))

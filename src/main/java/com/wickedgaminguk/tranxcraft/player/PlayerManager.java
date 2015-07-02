@@ -18,24 +18,28 @@ public class PlayerManager {
         this.plugin = plugin;
     }
 
-    public TranxPlayer getPlayer(Player player) {
-        if (playerCache.containsKey(player.getUniqueId().toString())) {
-            return playerCache.get(player.getUniqueId().toString());
+    public TranxPlayer getPlayer(String uuid) {
+        if (playerCache.containsKey(uuid)) {
+            return playerCache.get(uuid);
         }
         
-        return TranxPlayer.loadFromSql(plugin, player.getUniqueId().toString());
+        return TranxPlayer.loadFromSql(plugin, uuid);
     }
     
     public TranxPlayer getPlayer(CommandSender sender) {
         return getPlayer((Player) sender);
     }
 
+    public TranxPlayer getPlayer(Player player) {
+        return getPlayer(player.getUniqueId().toString());
+    }
+
     public TranxPlayer[] getPlayers() {
         if (playerCache.isEmpty()) {
             loadCache();
         }
-        
-        return (TranxPlayer[]) playerCache.entrySet().toArray();
+
+        return (playerCache.values().toArray(new TranxPlayer[playerCache.values().size()]));
     }
 
     public void insertPlayer(Player player) {
@@ -49,6 +53,8 @@ public class PlayerManager {
                 player.getAddress().getHostString(),
                 "Not Set",
                 Rank.PLAYER,
+                0,
+                0,
                 0,
                 0
         );
@@ -85,7 +91,9 @@ public class PlayerManager {
                         result.getString("forumname"),
                         Rank.valueOf(result.getString("rank").toUpperCase()),
                         result.getInt("kills"),
-                        result.getInt("deaths")
+                        result.getInt("deaths"),
+                        result.getInt("votes"),
+                        result.getDouble("currency")
                 ));
             }
         }

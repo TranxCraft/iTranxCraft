@@ -1,15 +1,13 @@
 package com.wickedgaminguk.tranxcraft.util;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
+import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StatisticManager extends BukkitRunnable {
@@ -46,5 +44,12 @@ public class StatisticManager extends BukkitRunnable {
 
     public static boolean hasStatisticsInQueue() {
         return !queue.isEmpty();
+    }
+
+    public static void runQueue() {
+        SqlModule sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
+        List<PreparedStatement> toRun = Collections.synchronizedList(queue);
+
+        toRun.forEach(sqlModule::execute);
     }
 }

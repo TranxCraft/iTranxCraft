@@ -76,18 +76,18 @@ public class ValidationUtils extends Util {
      * @param config The config that you wish to check.
      * @return Whether the config has valid MySQL details.
      */
-    public static boolean isValidSql(YamlConfig config) {
-        ConfigurationSection mySql = config.getConfigurationSection("mysql");
+    public static boolean isValidSqlConfig(YamlConfig config) {
+        ConfigurationSection sqlConfig = config.getConfigurationSection("mysql");
 
-        if (!exists(mySql.getString("hostname"), mySql.getString("port"), mySql.getString("username"), mySql.getString("password"), mySql.getString("database"))) {
+        if (!exists(sqlConfig.getString("hostname"), sqlConfig.getString("port"), sqlConfig.getString("username"), sqlConfig.getString("password"), sqlConfig.getString("database"))) {
             return false;
         }
         
-        if (!isValidHostname(mySql.getString("hostname"))) {
+        if (!isValidHostname(sqlConfig.getString("hostname"))) {
             return false;
         }
 
-        if (!isValidPort(mySql.getString("port"))) {
+        if (!isValidPort(sqlConfig.getString("port"))) {
             return false;
         }
 

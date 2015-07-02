@@ -63,3 +63,10 @@ commands:
     pwarplist:
         usage: /<command>
         description: Lists all available personal warps.
+    announcement:
+        usage: /<command> <add|set|remove|info|list>
+        description: Announcement management.
+    eco:
+        usage: /<command> <give|set|reset>
+        description: Economy management.
+

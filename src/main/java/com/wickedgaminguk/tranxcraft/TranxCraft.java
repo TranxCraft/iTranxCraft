@@ -6,6 +6,7 @@ import com.wickedgaminguk.tranxcraft.commands.Command_tranxcraft;
 import com.wickedgaminguk.tranxcraft.listeners.ListenerLoader;
 import com.wickedgaminguk.tranxcraft.listeners.PlayerListener;
 import com.wickedgaminguk.tranxcraft.modules.AnnouncementModule;
+import com.wickedgaminguk.tranxcraft.modules.GeoIpModule;
 import com.wickedgaminguk.tranxcraft.modules.MailModule;
 import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
 import com.wickedgaminguk.tranxcraft.modules.PushoverModule;
@@ -16,9 +17,9 @@ import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.BanManager;
 import com.wickedgaminguk.tranxcraft.player.PlayerManager;
-import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.RewardBot;
 import com.wickedgaminguk.tranxcraft.player.RewardWorker;
+import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
 import com.wickedgaminguk.tranxcraft.util.DebugUtils;
 import com.wickedgaminguk.tranxcraft.util.StatisticManager;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
@@ -29,7 +30,6 @@ import net.pravian.bukkitlib.command.BukkitCommandHandler;
 import net.pravian.bukkitlib.config.YamlConfig;
 import net.pravian.bukkitlib.implementation.BukkitPlugin;
 import net.pravian.bukkitlib.util.LoggerUtils;
-import net.pushover.client.MessagePriority;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -50,6 +50,7 @@ public class TranxCraft extends BukkitPlugin {
     public MailModule mailModule;
     public TwitterModule twitterModule;
     public PushoverModule pushoverModule;
+    public GeoIpModule geoIpModule;
     public AdminManager adminManager;
     public PlayerManager playerManager;
     public BanManager banManager;
@@ -70,7 +71,7 @@ public class TranxCraft extends BukkitPlugin {
 
         config.load();
 
-        if (!ValidationUtils.isValidSql(config)) {
+        if (!ValidationUtils.isValidSqlConfig(config)) {
             LoggerUtils.severe(plugin, "Invalid MySQL configuration found. This plugin will now disable.");
             Bukkit.getPluginManager().disablePlugin(plugin);
 
@@ -121,6 +122,7 @@ public class TranxCraft extends BukkitPlugin {
         mailModule = (MailModule) ModuleLoader.getModule("MailModule");
         twitterModule = (TwitterModule) ModuleLoader.getModule("TwitterModule");
         pushoverModule = (PushoverModule) ModuleLoader.getModule("PushoverModule");
+        geoIpModule = (GeoIpModule) ModuleLoader.getModule("GeoIpModule");
 
         banManager = new BanManager(plugin);
 
@@ -149,14 +151,21 @@ public class TranxCraft extends BukkitPlugin {
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", AnnouncementModule.getAnnouncementCount(), " announcements."));
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", banManager.loadCache(), " bans."));
         LoggerUtils.info(plugin, StrUtils.concatenate("Loaded ", adminManager.loadCache(), " admins."));
-
-        pushoverModule.sendNotifications(Rank.MODERATOR, MessagePriority.NORMAL, "Server started", "TranxCraft has been started successfully.");
     }
 
     @Override
     public void onDisable() {
         for (Admin admin : adminManager.getAdmins()) {
             admin.save();
+        }
+
+        for (TranxPlayer player : playerManager.getPlayers()) {
+            player.save();
+        }
+
+        if (StatisticManager.hasStatisticsInQueue()) {
+            LoggerUtils.info(plugin, "Found SQL statements in the queue that haven't been ran. Running...");
+            StatisticManager.runQueue();
         }
 
         if (database.isOpen()) {
