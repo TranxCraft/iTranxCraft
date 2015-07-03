@@ -4,6 +4,7 @@ import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
+import net.pravian.pendulum.Pendulum;
 import net.pushover.client.MessagePriority;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 public class PlayerUtils extends Util {
 
     private static boolean staffMode;
+    private static Pendulum timer = Pendulum.instance();
 
     public static void reportPlayer(Player sender, Player player, String report) {
         broadcastMessage(StrUtils.concatenate(ChatColor.RED, "[REPORTS] ", ChatColor.GOLD, sender.getName(), " has reported ", player.getName(), " for ", report), Rank.MODERATOR);
@@ -34,27 +36,8 @@ public class PlayerUtils extends Util {
     }
 
     public static boolean checkPermissions(CommandSender sender, Rank rank) {
-        if (!(sender instanceof Player)) {
-            return true;
-        }
+        return !(sender instanceof Player) || plugin.playerManager.getPlayer(sender).hasRank(rank);
 
-        if (rank.getRankLevel() >= Rank.MODERATOR.getRankLevel()) {
-            if (AdminManager.isAdmin(((Player) sender).getUniqueId().toString())) {
-                if (Admin.fromUuid(((Player) sender).getUniqueId().toString()).getRank().getRankLevel() >= rank.getRankLevel()) {
-                    return true;
-                }
-            }
-        }
-
-        TranxPlayer player = plugin.playerManager.getPlayer(sender);
-
-        DebugUtils.debug(2, player.getName() + " has a rank of " + player.getRank().toString());
-
-        if (plugin.playerManager.getPlayer(sender).hasRank(rank)) {
-            return true;
-        }
-
-        return false;
     }
 
     public static boolean checkPermissions(CommandSender sender, String rankType) {
@@ -65,5 +48,9 @@ public class PlayerUtils extends Util {
             DebugUtils.debug("Invalid Rank " + rankType);
             return false;
         }
+    }
+
+    public static Pendulum getTimer() {
+        return timer;
     }
 }

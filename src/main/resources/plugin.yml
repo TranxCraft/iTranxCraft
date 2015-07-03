@@ -69,4 +69,7 @@ commands:
     eco:
         usage: /<command> <give|set|reset>
         description: Economy management.
+    reloadcache:
+        usage: /<command> <admins|players|bans|all>
+        description: Reloads the cache.
 

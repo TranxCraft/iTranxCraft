@@ -70,43 +70,43 @@ public class GeoIpModule extends Module<TranxCraft> {
     public String formatMessage(CityResponse response) {
         switch (response.getCountry().getName()) {
             case "United States": {
-                return "The United States";
+                return "the United States";
             }
 
             case "United Kingdom": {
-                return "The United Kingdom";
+                return "the United Kingdom";
             }
 
             case "Philippines": {
-                return "The Philippines";
+                return "the Philippines";
             }
 
             case "Netherlands": {
-                return "The Netherlands";
+                return "the Netherlands";
             }
 
             case "Czech Republic": {
-                return "The Czech Republic";
+                return "the Czech Republic";
             }
 
             case "United Arab Emirates": {
-                return "The United Arab Emirates";
+                return "the United Arab Emirates";
             }
 
             case "Dominican Republic": {
-                return "The Dominican Republic";
+                return "the Dominican Republic";
             }
 
             case "Democratic Republic of the Congo": {
-                return "The Democratic Republic of the Congo";
+                return "the Democratic Republic of the Congo";
             }
 
             case "Ivory Coast": {
-                return "The Ivory Coast";
+                return "the Ivory Coast";
             }
 
             case "Republic of the Congo": {
-                return "The Republic of the Congo";
+                return "the Republic of the Congo";
             }
 
             case "Central African Republic": {
@@ -114,7 +114,7 @@ public class GeoIpModule extends Module<TranxCraft> {
             }
 
             case "French Polynesia": {
-                return "The French Polynesia";
+                return "the French Polynesia";
             }
 
             case "Somalia": {
@@ -122,39 +122,39 @@ public class GeoIpModule extends Module<TranxCraft> {
             }
 
             case "Solomon Islands": {
-                return "The Solomon Islands";
+                return "the Solomon Islands";
             }
 
             case "Seychelles": {
-                return "The Seychelles";
+                return "the Seychelles";
             }
 
             case "Faroe Islands": {
-                return "The Faroe Islands";
+                return "the Faroe Islands";
             }
 
             case "Cayman Islands": {
-                return "The Cayman Islands";
+                return "the Cayman Islands";
             }
 
             case "U.S. Virgin Islands": {
-                return "The US Virgin Islands";
+                return "the US Virgin Islands";
             }
 
             case "Micronesia, Federated States of": {
-                return "The Federated States of Micronesia";
+                return "the Federated States of Micronesia";
             }
 
             case "British Virgin Islands": {
-                return "The British Virgin Islands";
+                return "the British Virgin Islands";
             }
 
             case "Marshall Islands": {
-                return "The Marshal Islands";
+                return "the Marshal Islands";
             }
 
             case "Falkland Islands": {
-                return "The Falkland Islands";
+                return "the Falkland Islands";
             }
 
             default: {

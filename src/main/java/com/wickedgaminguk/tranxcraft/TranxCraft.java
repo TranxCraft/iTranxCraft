@@ -5,6 +5,7 @@ import com.wickedgaminguk.tranxcraft.bridge.ipboard.IpBoard;
 import com.wickedgaminguk.tranxcraft.commands.Command_tranxcraft;
 import com.wickedgaminguk.tranxcraft.listeners.ListenerLoader;
 import com.wickedgaminguk.tranxcraft.listeners.PlayerListener;
+import com.wickedgaminguk.tranxcraft.listeners.StatisticsListener;
 import com.wickedgaminguk.tranxcraft.modules.AnnouncementModule;
 import com.wickedgaminguk.tranxcraft.modules.GeoIpModule;
 import com.wickedgaminguk.tranxcraft.modules.MailModule;
@@ -33,7 +34,10 @@ import net.pravian.bukkitlib.util.LoggerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import java.io.File;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 public class TranxCraft extends BukkitPlugin {
@@ -155,12 +159,27 @@ public class TranxCraft extends BukkitPlugin {
 
     @Override
     public void onDisable() {
+        LoggerUtils.info(plugin, "Saving Admin data...");
         for (Admin admin : adminManager.getAdmins()) {
             admin.save();
         }
 
+        LoggerUtils.info(plugin, "Saving Player data...");
         for (TranxPlayer player : playerManager.getPlayers()) {
             player.save();
+        }
+
+        if (!StatisticsListener.getStepCache().isEmpty()) {
+            LoggerUtils.info(plugin, "Adding remaining step cache to statistics queue...");
+
+            for (Map.Entry<Player, AtomicInteger> entry : StatisticsListener.getStepCache().entrySet()) {
+                StatisticsListener.incrementPlayerStatistic(entry.getKey(), "steps_taken", entry.getValue().get());
+            }
+        }
+
+        if (StatisticsListener.getTotalStepCache() != 0) {
+            LoggerUtils.info(plugin, "Adding remaining global step cache to statistics queue...");
+            sqlModule.incrementStatistic("global_player_steps_taken", StatisticsListener.getTotalStepCache());
         }
 
         if (StatisticManager.hasStatisticsInQueue()) {

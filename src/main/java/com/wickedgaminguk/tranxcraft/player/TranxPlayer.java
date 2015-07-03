@@ -29,10 +29,11 @@ public class TranxPlayer {
     private int kills = 0;
     private int deaths = 0;
     private int votes = 0;
+    private int playTime = 0;
 
     private double currency = 0;
 
-    public TranxPlayer(String uuid, String player, String latestIp, String forumName, Rank rank, int kills, int deaths, int votes, double currency) {
+    public TranxPlayer(String uuid, String player, String latestIp, String forumName, Rank rank, int kills, int deaths, int votes, double currency, int playTime) {
         this.uuid = uuid;
         this.name = player;
         this.latestIp = latestIp;
@@ -41,6 +42,7 @@ public class TranxPlayer {
         this.kills = kills;
         this.deaths = deaths;
         this.votes = votes;
+        this.playTime = playTime;
     }
 
     public TranxPlayer(String uuid) {
@@ -157,6 +159,22 @@ public class TranxPlayer {
         return this;
     }
 
+    public int getPlayTime() {
+        return playTime;
+    }
+
+    public TranxPlayer setPlayTime(int playTime) {
+        this.playTime = playTime;
+        save();
+        return this;
+    }
+
+    public TranxPlayer addToPlayTime(int playTime) {
+        this.playTime += playTime;
+        save();
+        return this;
+    }
+
     public Player getPlayer() {
         return Bukkit.getPlayer(UUID.fromString(getUuid()));
     }
@@ -185,7 +203,7 @@ public class TranxPlayer {
      */
     public void save() {
         SqlModule sql = (SqlModule) ModuleLoader.getModule("SqlModule");
-        sql.getDatabase().update("UPDATE `players` SET `player` = ?, `latestip` = ?, `rank` = ?, `kills` = ?, `deaths` = ?, `forumname` = ?, `votes` = ?, `currency` = ? WHERE `uuid` = ?", getName(), getLatestIp(), getRank().toString().toLowerCase(), String.valueOf(getKills()), String.valueOf(getDeaths()), getForumName(), String.valueOf(getVotes()), String.valueOf(getCurrency()), getUuid());
+        sql.getDatabase().update("UPDATE `players` SET `player` = ?, `latestip` = ?, `rank` = ?, `kills` = ?, `deaths` = ?, `forumname` = ?, `votes` = ?, `currency` = ?, `playtime` = ? WHERE `uuid` = ?", getName(), getLatestIp(), getRank().toString().toLowerCase(), String.valueOf(getKills()), String.valueOf(getDeaths()), getForumName(), String.valueOf(getVotes()), String.valueOf(getCurrency()), String.valueOf(getPlayTime()), getUuid());
     }
 
     public static TranxPlayer loadFromSql(TranxCraft plugin, String uuid) {
@@ -215,7 +233,8 @@ public class TranxPlayer {
                     .setForumName(result.getString("forumname"))
                     .setVotes(result.getInt("votes"))
                     .setFriends(getFriends(result.getString("friends")))
-                    .setCurrency(result.getDouble("currency"));
+                    .setCurrency(result.getDouble("currency"))
+                    .setPlayTime(result.getInt("playtime"));
 
             return player;
         }
@@ -252,7 +271,8 @@ public class TranxPlayer {
                     .setForumName(result.getString("forumname"))
                     .setVotes(result.getInt("votes"))
                     .setFriends(getFriends(result.getString("friends")))
-                    .setCurrency(result.getDouble("currency"));
+                    .setCurrency(result.getDouble("currency"))
+                    .setPlayTime(result.getInt("playtime"));
 
             return player;
         }

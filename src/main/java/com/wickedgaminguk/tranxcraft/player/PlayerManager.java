@@ -43,36 +43,53 @@ public class PlayerManager {
     }
 
     public void insertPlayer(Player player) {
-        ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `players` WHERE `uuid` = ?", player.getUniqueId().toString());
+        if (!playerCache.containsKey(player.getUniqueId().toString())) {
+            ResultSet result = plugin.sqlModule.getDatabase().query("SELECT * FROM `players` WHERE `uuid` = ?", player.getUniqueId().toString());
 
-        DebugUtils.debug(2, DebugUtils.resultSetToJSON(result));
+            DebugUtils.debug(2, DebugUtils.resultSetToJSON(result));
 
-        TranxPlayer tPlayer = new TranxPlayer(
-                player.getUniqueId().toString(),
-                player.getName(),
-                player.getAddress().getHostString(),
-                "Not Set",
-                Rank.PLAYER,
-                0,
-                0,
-                0,
-                0
-        );
+            TranxPlayer tPlayer = new TranxPlayer(
+                    player.getUniqueId().toString(),
+                    player.getName(),
+                    player.getAddress().getHostString(),
+                    "Not Set",
+                    Rank.PLAYER,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+            );
 
-        try {
-            playerCache.put(tPlayer.getUuid(), tPlayer);
+            try {
+                if (result.isBeforeFirst()) {
+                    DebugUtils.debug(1, StrUtils.concatenate("Data found for ", tPlayer.getName()));
 
-            if (result.isBeforeFirst()) {
-                DebugUtils.debug(1, StrUtils.concatenate("Data found for ", tPlayer.getName()));
-                plugin.sqlModule.getDatabase().update("UPDATE `players` SET `player` = ?, `latestip` = ? WHERE `uuid` = ?;", tPlayer.getName(), tPlayer.getLatestIp(), tPlayer.getUuid());
+                    result.next();
 
-                return;
+                    playerCache.put(player.getUniqueId().toString(), new TranxPlayer(
+                            result.getString("uuid"),
+                            result.getString("player"),
+                            result.getString("latestip"),
+                            result.getString("forumname"),
+                            Rank.valueOf(result.getString("rank").toUpperCase()),
+                            result.getInt("kills"),
+                            result.getInt("deaths"),
+                            result.getInt("votes"),
+                            result.getDouble("currency"),
+                            result.getInt("playtime")
+                    ));
+
+                    plugin.sqlModule.getDatabase().update("UPDATE `players` SET `player` = ?, `latestip` = ? WHERE `uuid` = ?;", tPlayer.getName(), tPlayer.getLatestIp(), tPlayer.getUuid());
+                }
+                else {
+                    playerCache.put(tPlayer.getUuid(), tPlayer);
+                    plugin.sqlModule.getDatabase().update("INSERT INTO `players` (`uuid`, `player`, `latestip`, `kills`, `deaths`, `forumname`, `rank`, `currency`, `playtime`) VALUES (?, ?, ?, ?, ?, ?, ?);", player.getUniqueId().toString(), player.getName(), player.getAddress().getHostString(), "0", "0", "Not Set", Rank.PLAYER.toString(), "0", "0");
+                }
             }
-
-            plugin.sqlModule.getDatabase().update("INSERT INTO `players` (`uuid`, `player`, `latestip`, `kills`, `deaths`, `forumname`, `rank`) VALUES (?, ?, ?, ?, ?, ?, ?);", player.getUniqueId().toString(), player.getName(), player.getAddress().getHostString(), "0", "0", "Not Set", Rank.PLAYER.toString());
-        }
-        catch (SQLException ex) {
-            DebugUtils.debug(ex);
+            catch (SQLException ex) {
+                DebugUtils.debug(ex);
+            }
         }
     }
 
@@ -93,7 +110,8 @@ public class PlayerManager {
                         result.getInt("kills"),
                         result.getInt("deaths"),
                         result.getInt("votes"),
-                        result.getDouble("currency")
+                        result.getDouble("currency"),
+                        result.getInt("playtime")
                 ));
             }
         }
@@ -104,5 +122,10 @@ public class PlayerManager {
         playerCache.putAll(players);
         
         return playerCache;
+    }
+
+    public void reloadCache() {
+        playerCache.clear();
+        loadCache();
     }
 }

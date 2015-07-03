@@ -1,6 +1,8 @@
 package com.wickedgaminguk.tranxcraft.listeners;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
+import com.wickedgaminguk.tranxcraft.modules.ModuleLoader;
+import com.wickedgaminguk.tranxcraft.modules.SqlModule;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,8 +61,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class StatisticsListener extends Listener<TranxCraft> {
 
-    private HashMap<Player, AtomicInteger> stepCache = new HashMap<>();
-    private int totalStepCache = 0;
+    private static HashMap<Player, AtomicInteger> stepCache = new HashMap<>();
+    private static int totalStepCache = 0;
+
+    private static SqlModule sqlModule = (SqlModule) ModuleLoader.getModule("SqlModule");
 
     //region Player Events
 
@@ -68,11 +72,11 @@ public class StatisticsListener extends Listener<TranxCraft> {
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         if (event.getEntity() instanceof Player) {
             incrementPlayerStatistic(event.getEntity(), "deaths");
-            plugin.sqlModule.incrementStatistic("global_player_deaths");
+            sqlModule.incrementStatistic("global_player_deaths");
 
             if (event.getEntity().getKiller() instanceof Player) {
                 incrementPlayerStatistic(event.getEntity().getKiller(), "kills");
-                plugin.sqlModule.incrementStatistic("global_player_kills");
+                sqlModule.incrementStatistic("global_player_kills");
             }
         }
     }
@@ -80,49 +84,49 @@ public class StatisticsListener extends Listener<TranxCraft> {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "joins");
-        plugin.sqlModule.incrementStatistic("global_player_joins");
+        sqlModule.incrementStatistic("global_player_joins");
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "leaves");
-        plugin.sqlModule.incrementStatistic("global_player_leaves");
+        sqlModule.incrementStatistic("global_player_leaves");
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "messages");
-        plugin.sqlModule.incrementStatistic("global_player_messages");
+        sqlModule.incrementStatistic("global_player_messages");
     }
 
     @EventHandler
     public void onPlayerAchievementAward(PlayerAchievementAwardedEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "achievements");
-        plugin.sqlModule.incrementStatistic("global_player_achievements");
+        sqlModule.incrementStatistic("global_player_achievements");
     }
 
     @EventHandler
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "bed_joins");
-        plugin.sqlModule.incrementStatistic("global_player_bed_joins");
+        sqlModule.incrementStatistic("global_player_bed_joins");
     }
 
     @EventHandler
     public void onPlayerBedLeave(PlayerBedLeaveEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "bed_leaves");
-        plugin.sqlModule.incrementStatistic("global_player_bed_leaves");
+        sqlModule.incrementStatistic("global_player_bed_leaves");
     }
 
     @EventHandler
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "bucket_fills");
-        plugin.sqlModule.incrementStatistic("global_player_bucket_fills");
+        sqlModule.incrementStatistic("global_player_bucket_fills");
     }
 
     @EventHandler
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "bucket_empties");
-        plugin.sqlModule.incrementStatistic("global_player_bucket_empties");
+        sqlModule.incrementStatistic("global_player_bucket_empties");
     }
 
     @EventHandler
@@ -132,8 +136,8 @@ public class StatisticsListener extends Listener<TranxCraft> {
         incrementPlayerStatistic(event.getPlayer(), "commands");
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate("command_", command));
 
-        plugin.sqlModule.incrementStatistic("global_player_commands");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_player_command_", command));
+        sqlModule.incrementStatistic("global_player_commands");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_player_command_", command));
     }
 
     @EventHandler
@@ -142,8 +146,8 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
         incrementPlayerStatistic(event.getPlayer(), "item_drops");
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate(item, "_drops"));
-        plugin.sqlModule.incrementStatistic("global_player_item_drops");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_drops"));
+        sqlModule.incrementStatistic("global_player_item_drops");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_drops"));
     }
 
     @EventHandler
@@ -152,20 +156,20 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
         incrementPlayerStatistic(event.getPlayer(), "item_pickups");
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate(item, "_pickups"));
-        plugin.sqlModule.incrementStatistic("global_player_item_pickups");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_pickups"));
+        sqlModule.incrementStatistic("global_player_item_pickups");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_pickups"));
     }
 
     @EventHandler
     public void onPlayerEggThrow(PlayerEggThrowEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "egg_throws");
-        plugin.sqlModule.incrementStatistic("global_player_egg_throws");
+        sqlModule.incrementStatistic("global_player_egg_throws");
     }
 
     @EventHandler
     public void onPlayerFish(PlayerFishEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "fish");
-        plugin.sqlModule.incrementStatistic("global_player_fish");
+        sqlModule.incrementStatistic("global_player_fish");
     }
 
     @EventHandler
@@ -174,8 +178,8 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
         incrementPlayerStatistic(event.getPlayer(), "item_breaks");
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate(item, "_breaks"));
-        plugin.sqlModule.incrementStatistic("global_player_item_breaks");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_breaks"));
+        sqlModule.incrementStatistic("global_player_item_breaks");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_breaks"));
     }
 
     @EventHandler
@@ -184,15 +188,15 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
         incrementPlayerStatistic(event.getPlayer(), "items_consumed");
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate(item, "consumed"));
-        plugin.sqlModule.incrementStatistic("global_player_items_consumed");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_consumed"));
+        sqlModule.incrementStatistic("global_player_items_consumed");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_player_", item, "_consumed"));
     }
 
     @EventHandler
     public void onPlayerLevelChange(PlayerLevelChangeEvent event) {
         if (event.getNewLevel() > event.getOldLevel()) {
             incrementPlayerStatistic(event.getPlayer(), "level_ups");
-            plugin.sqlModule.incrementStatistic("global_player_level_ups");
+            sqlModule.incrementStatistic("global_player_level_ups");
         }
     }
 
@@ -214,7 +218,7 @@ public class StatisticsListener extends Listener<TranxCraft> {
         }
 
         if (totalStepCache >= 1000) {
-            plugin.sqlModule.incrementStatistic("global_player_steps_taken", totalStepCache);
+            sqlModule.incrementStatistic("global_player_steps_taken", totalStepCache);
             totalStepCache = 0;
         }
     }
@@ -222,19 +226,19 @@ public class StatisticsListener extends Listener<TranxCraft> {
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "portals");
-        plugin.sqlModule.incrementStatistic("global_player_portals");
+        sqlModule.incrementStatistic("global_player_portals");
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "respawns");
-        plugin.sqlModule.incrementStatistic("global_player_respawns");
+        sqlModule.incrementStatistic("global_player_respawns");
     }
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         incrementPlayerStatistic(event.getPlayer(), "teleports");
-        plugin.sqlModule.incrementStatistic("global_player_teleports");
+        sqlModule.incrementStatistic("global_player_teleports");
     }
 
     //endregion
@@ -245,20 +249,20 @@ public class StatisticsListener extends Listener<TranxCraft> {
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         String name = event.getEntityType().toString().replace("_", "").toLowerCase();
 
-        plugin.sqlModule.incrementStatistic("global_entity_spawns");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_entity_", name, "_spawns"));
+        sqlModule.incrementStatistic("global_entity_spawns");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_entity_", name, "_spawns"));
     }
 
     @EventHandler
     public void onSuperCreeper(CreeperPowerEvent event) {
-        plugin.sqlModule.incrementStatistic("global_entity_creeper_powerups");
+        sqlModule.incrementStatistic("global_entity_creeper_powerups");
     }
 
     @EventHandler
     public void onEntityShootBow(EntityShootBowEvent event) {
         String firer = event.getEntity().getType().toString().replace("_", "").toLowerCase();
 
-        plugin.sqlModule.incrementStatistic("global_creature_");
+        sqlModule.incrementStatistic("global_creature_");
     }
 
     //endregion
@@ -267,19 +271,19 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
     @EventHandler
     public void onLightningStrike(LightningStrikeEvent event) {
-        plugin.sqlModule.incrementStatistic("global_weather_lightning");
+        sqlModule.incrementStatistic("global_weather_lightning");
     }
 
     @EventHandler
     public void onThunderChange(ThunderChangeEvent event) {
         if (event.toThunderState()) {
-            plugin.sqlModule.incrementStatistic("global_weather_thunder");
+            sqlModule.incrementStatistic("global_weather_thunder");
         }
     }
 
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent event) {
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_weather_", (event.toWeatherState() ? "rain" : "sun")));
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_weather_", (event.toWeatherState() ? "rain" : "sun")));
     }
 
     //endregion
@@ -288,22 +292,22 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
     @EventHandler
     public void onVehicleCreate(VehicleCreateEvent event) {
-        plugin.sqlModule.incrementStatistic("global_vehicle_creates");
+        sqlModule.incrementStatistic("global_vehicle_creates");
     }
 
     @EventHandler
     public void onVehicleDestory(VehicleDestroyEvent event) {
-        plugin.sqlModule.incrementStatistic("global_vehicle_destroys");
+        sqlModule.incrementStatistic("global_vehicle_destroys");
     }
 
     @EventHandler
     public void onVehicleExit(VehicleExitEvent event) {
-        plugin.sqlModule.incrementStatistic("global_vehicle_exits");
+        sqlModule.incrementStatistic("global_vehicle_exits");
     }
 
     @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
-        plugin.sqlModule.incrementStatistic("global_vehicle_moves");
+        sqlModule.incrementStatistic("global_vehicle_moves");
     }
 
     //endregion
@@ -312,7 +316,7 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
     @EventHandler
     public void onServerListPing(ServerListPingEvent event) {
-        plugin.sqlModule.incrementStatistic("global_server_list_pings");
+        sqlModule.incrementStatistic("global_server_list_pings");
     }
 
     //endregion
@@ -325,8 +329,8 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
         incrementPlayerStatistic(event.getPlayer(), "hanging_places");
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate("hanging_", block, "_places"));
-        plugin.sqlModule.incrementStatistic("global_hanging_places");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_hanging_", block, "_places"));
+        sqlModule.incrementStatistic("global_hanging_places");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_hanging_", block, "_places"));
     }
 
     @EventHandler
@@ -340,8 +344,8 @@ public class StatisticsListener extends Listener<TranxCraft> {
     public void onHangingBreak(HangingBreakEvent event) {
         String block = event.getEntity().toString();
 
-        plugin.sqlModule.incrementStatistic("global_hanging_breaks");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_hanging_", block, "_breaks"));
+        sqlModule.incrementStatistic("global_hanging_breaks");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_hanging_", block, "_breaks"));
     }
 
     //endregion
@@ -350,31 +354,31 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
     @EventHandler
     public void onBrew(BrewEvent event) {
-        plugin.sqlModule.incrementStatistic("global_inventory_brews");
+        sqlModule.incrementStatistic("global_inventory_brews");
     }
 
     @EventHandler
     public void onCraftItem(CraftItemEvent event) {
         String item = event.getInventory().getResult().getType().toString();
 
-        plugin.sqlModule.incrementStatistic("global_inventory_crafts");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_", item, "_crafts"));
+        sqlModule.incrementStatistic("global_inventory_crafts");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_", item, "_crafts"));
     }
 
     @EventHandler
     public void onFurnaceBurn(FurnaceBurnEvent event) {
         String item = event.getBlock().getType().toString().toLowerCase();
 
-        plugin.sqlModule.incrementStatistic("global_inventory_furnace_burns");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_furnace_", item, "_burns"));
+        sqlModule.incrementStatistic("global_inventory_furnace_burns");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_furnace_", item, "_burns"));
     }
 
     @EventHandler
     public void onFurnaceSmelt(FurnaceSmeltEvent event) {
         String item = event.getBlock().getType().toString().toLowerCase();
 
-        plugin.sqlModule.incrementStatistic("global_inventory_furnace_smelts");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_furnace_", item, "_smelts"));
+        sqlModule.incrementStatistic("global_inventory_furnace_smelts");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_furnace_", item, "_smelts"));
     }
 
     @EventHandler
@@ -383,20 +387,20 @@ public class StatisticsListener extends Listener<TranxCraft> {
 
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate("inventory_furnace_", item, "_extracts"));
         incrementPlayerStatistic(event.getPlayer(), "inventory_furnace_extracts");
-        plugin.sqlModule.incrementStatistic("global_inventory_furnace_extracts");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_furnace_", item, "_extracts"));
+        sqlModule.incrementStatistic("global_inventory_furnace_extracts");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_inventory_furnace_", item, "_extracts"));
     }
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
         incrementPlayerStatistic((Player) event.getPlayer(), "inventory_open");
-        plugin.sqlModule.incrementStatistic("global_inventory_open");
+        sqlModule.incrementStatistic("global_inventory_open");
     }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         incrementPlayerStatistic((Player) event.getPlayer(), "inventory_close");
-        plugin.sqlModule.incrementStatistic("global_inventory_close");
+        sqlModule.incrementStatistic("global_inventory_close");
     }
 
     //endregion
@@ -412,9 +416,9 @@ public class StatisticsListener extends Listener<TranxCraft> {
         incrementPlayerStatistic(event.getEnchanter(), "enchant_items_enchanted");
         incrementPlayerStatistic(event.getEnchanter(), "enchant_cost", cost);
 
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_enchant_", item, "_enchanted"));
-        plugin.sqlModule.incrementStatistic("global_enchant_items_enchanted");
-        plugin.sqlModule.incrementStatistic("global_enchant_cost", cost);
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_enchant_", item, "_enchanted"));
+        sqlModule.incrementStatistic("global_enchant_items_enchanted");
+        sqlModule.incrementStatistic("global_enchant_cost", cost);
     }
 
     //endregion
@@ -428,8 +432,8 @@ public class StatisticsListener extends Listener<TranxCraft> {
         incrementPlayerStatistic(event.getPlayer(), "block_placed");
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate("block_", block, "_placed"));
 
-        plugin.sqlModule.incrementStatistic("global_block_placed");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_block_", block, "_placed"));
+        sqlModule.incrementStatistic("global_block_placed");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_block_", block, "_placed"));
     }
 
     @EventHandler
@@ -441,49 +445,57 @@ public class StatisticsListener extends Listener<TranxCraft> {
         incrementPlayerStatistic(event.getPlayer(), StrUtils.concatenate("block_", block, "_broken"));
         incrementPlayerStatistic(event.getPlayer(), "block_experience_gained", experience);
 
-        plugin.sqlModule.incrementStatistic("global_block_broken");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_block_", block, "_broken"));
-        plugin.sqlModule.incrementStatistic("global_block_experience_gained", experience);
+        sqlModule.incrementStatistic("global_block_broken");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_block_", block, "_broken"));
+        sqlModule.incrementStatistic("global_block_experience_gained", experience);
     }
 
     @EventHandler
     public void onBlockBurnEvent(BlockBurnEvent event) {
-        plugin.sqlModule.incrementStatistic("global_block_burned");
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("global_block_", event.getBlock().getType().toString().toLowerCase(), "_burned"));
+        sqlModule.incrementStatistic("global_block_burned");
+        sqlModule.incrementStatistic(StrUtils.concatenate("global_block_", event.getBlock().getType().toString().toLowerCase(), "_burned"));
     }
 
     @EventHandler
     public void onBlockPistonExtendEvent(BlockPistonExtendEvent event) {
-        plugin.sqlModule.incrementStatistic("global_block_piston_triggered");
-        plugin.sqlModule.incrementStatistic("global_block_piston_extend");
+        sqlModule.incrementStatistic("global_block_piston_triggered");
+        sqlModule.incrementStatistic("global_block_piston_extend");
     }
 
     @EventHandler
     public void onBlockPistonRetractEvent(BlockPistonRetractEvent event) {
-        plugin.sqlModule.incrementStatistic("global_block_piston_triggered");
-        plugin.sqlModule.incrementStatistic("global_block_piston_retract");
+        sqlModule.incrementStatistic("global_block_piston_triggered");
+        sqlModule.incrementStatistic("global_block_piston_retract");
     }
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        plugin.sqlModule.incrementStatistic("global_block_sign_change");
+        sqlModule.incrementStatistic("global_block_sign_change");
     }
 
     //endregion
 
     //region Helper Methods
 
-    private void incrementPlayerStatistic(Player player, String statistic) {
-        //plugin.sqlModule.incrementStatistic(StrUtils.concatenate("player_", player.getUniqueId().toString(), "_", statistic));
+    public static void incrementPlayerStatistic(Player player, String statistic) {
+        //sqlModule.incrementStatistic(StrUtils.concatenate("player_", player.getUniqueId().toString(), "_", statistic));
         incrementPlayerStatistic(player, statistic, 1);
     }
 
-    private void incrementPlayerStatistic(Player player, String statistic, int amount) {
-        plugin.sqlModule.incrementStatistic(StrUtils.concatenate("player_", player.getUniqueId().toString().replace("-", ""), "_", statistic), amount);
+    public static void incrementPlayerStatistic(Player player, String statistic, int amount) {
+        sqlModule.incrementStatistic(StrUtils.concatenate("player_", player.getUniqueId().toString().replace("-", ""), "_", statistic), amount);
     }
 
-    private String convertItemName(ItemStack itemStack) {
+    public static String convertItemName(ItemStack itemStack) {
         return itemStack.getType().toString().replace("_", "").toLowerCase();
+    }
+
+    public static HashMap<Player, AtomicInteger> getStepCache() {
+        return stepCache;
+    }
+
+    public static int getTotalStepCache() {
+        return totalStepCache;
     }
 
     //endregion

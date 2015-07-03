@@ -5,7 +5,9 @@ import com.wickedgaminguk.tranxcraft.player.Admin;
 import com.wickedgaminguk.tranxcraft.player.AdminManager;
 import com.wickedgaminguk.tranxcraft.player.Rank;
 import com.wickedgaminguk.tranxcraft.player.RewardPlayerData;
+import com.wickedgaminguk.tranxcraft.player.TranxPlayer;
 import com.wickedgaminguk.tranxcraft.util.BanUtils;
+import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import com.wickedgaminguk.tranxcraft.util.StaffUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
@@ -23,6 +25,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import java.util.logging.Logger;
 
 public class PlayerListener extends Listener<TranxCraft> {
 
@@ -61,6 +65,8 @@ public class PlayerListener extends Listener<TranxCraft> {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
+        PlayerUtils.getTimer().start(event.getPlayer().getUniqueId().toString());
+
         event.setJoinMessage(StrUtils.concatenate(ChatColor.YELLOW, event.getPlayer().getName(), " has joined from ", plugin.geoIpModule.formatMessage(plugin.geoIpModule.getInfo(event.getPlayer().getAddress().getAddress()))));
 
         plugin.sqlModule.incrementStatistic("global_player_joins");
@@ -83,6 +89,17 @@ public class PlayerListener extends Listener<TranxCraft> {
         
         plugin.warnModule.runCheck(event.getPlayer());
     }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        TranxPlayer player = plugin.playerManager.getPlayer(event.getPlayer().getUniqueId().toString());
+
+        PlayerUtils.getTimer().stop(player.getUuid());
+
+        int playTime = (int) PlayerUtils.getTimer().getGlobalElement().getTimer(player.getUuid()).getData().getLastMs();
+
+        player.addToPlayTime(playTime);
+    }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPreProcessCommand(PlayerCommandPreprocessEvent event) {
@@ -101,6 +118,8 @@ public class PlayerListener extends Listener<TranxCraft> {
             com.wickedgaminguk.tranxcraft.util.ChatUtils.sendAdminChatMessage(event.getPlayer().getName(), event.getMessage());
             event.setCancelled(true);
         }
+
+        plugin.sqlModule.getDatabase().update("INSERT INTO `chat_log` (`player`, `uuid`, `message`) VALUES (?, ?, ?);", event.getPlayer().getName(), event.getPlayer().getUniqueId().toString(), event.getMessage());
     }
 
     @EventHandler

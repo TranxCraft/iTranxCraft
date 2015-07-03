@@ -2,6 +2,7 @@ package com.wickedgaminguk.tranxcraft.commands;
 
 import com.wickedgaminguk.tranxcraft.TranxCraft;
 import com.wickedgaminguk.tranxcraft.util.FetcherUtils;
+import com.wickedgaminguk.tranxcraft.util.PlayerUtils;
 import com.wickedgaminguk.tranxcraft.util.StrUtils;
 import com.wickedgaminguk.tranxcraft.util.ValidationUtils;
 import net.pravian.bukkitlib.command.BukkitCommand;
@@ -24,7 +25,7 @@ public class Command_namehistory extends BukkitCommand<TranxCraft> {
             return showUsage();
         }
 
-        Player player = getPlayer(args[0]);
+        Player player = PlayerUtils.getPlayer(args[0]);
         UUID playerId;
 
         if (player != null) {

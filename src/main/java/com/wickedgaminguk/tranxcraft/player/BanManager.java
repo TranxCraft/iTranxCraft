@@ -188,4 +188,9 @@ public class BanManager {
         
         return banCount;
     }
+
+    public void reloadCache() {
+        banCache.clear();
+        loadCache();
+    }
 }
